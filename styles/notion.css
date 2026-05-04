@@ -2057,7 +2057,8 @@ pre.notion-code[class*='language-mermaid'] {
 }
 html.dark pre.notion-code.language-mermaid,
 html.dark pre.notion-code[class*='language-mermaid'] {
-  background-color: #111827 !important;
+  /* 深色页内用浅灰衬底，衬托 Mermaid 默认的深灰/黑连线（不改 mermaid JS） */
+  background-color: #e2e8f0 !important;
 }
 
 /* mermaid 原文隐藏 */

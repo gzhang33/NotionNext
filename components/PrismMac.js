@@ -242,47 +242,6 @@ const renderCollapseCode = (codeCollapse, codeCollapseExpandDefault) => {
 }
 
 /**
- * Mermaid 主题：浅色用 neutral（打印/文档向，连线比 default 更清晰）；
- * 深色用 dark + themeVariables 提亮连线与箭头（需 hex，见 mermaid 文档）。
- */
-function getMermaidInitOptions() {
-  const isDark =
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark')
-  if (isDark) {
-    return {
-      startOnLoad: false,
-      securityLevel: 'loose',
-      theme: 'dark',
-      themeVariables: {
-        lineColor: '#e2e8f0',
-        secondaryColor: '#cbd5e1',
-        tertiaryColor: '#94a3b8',
-        arrowheadColor: '#f8fafc',
-        clusterBorder: '#cbd5e1',
-        edgeLabelBackground: '#0f172a',
-        primaryColor: '#64748b',
-        primaryTextColor: '#f1f5f9',
-        secondaryTextColor: '#e2e8f0',
-        tertiaryTextColor: '#cbd5e1',
-        mainBkg: '#334155',
-        secondBkg: '#1e293b'
-      }
-    }
-  }
-  return {
-    startOnLoad: false,
-    securityLevel: 'loose',
-    theme: 'neutral',
-    themeVariables: {
-      lineColor: '#475569',
-      arrowheadColor: '#1e293b',
-      clusterBorder: '#64748b'
-    }
-  }
-}
-
-/**
  * 将mermaid语言 渲染成图片
  */
 const renderMermaid = mermaidCDN => {
@@ -317,11 +276,6 @@ const renderMermaid = mermaidCDN => {
         try {
           const mermaid = window.mermaid
           if (!mermaid) return
-          try {
-            mermaid.initialize(getMermaidInitOptions())
-          } catch (_) {
-            /* 重复 initialize 时部分版本会抛错，忽略 */
-          }
           mermaid?.contentLoaded()
         } catch (err) {
           console.warn('[PrismMac] mermaid render failed:', err)

@@ -276,6 +276,16 @@ const renderMermaid = mermaidCDN => {
         try {
           const mermaid = window.mermaid
           if (!mermaid) return
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: document.documentElement.classList.contains('dark')
+                ? 'dark'
+                : 'default'
+            })
+          } catch (_) {
+            /* 重复 initialize 时部分版本会抛错，忽略 */
+          }
           mermaid?.contentLoaded()
         } catch (err) {
           console.warn('[PrismMac] mermaid render failed:', err)

@@ -2,7 +2,6 @@ import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData, getPostBlocks } from '@/lib/db/SiteDataApi'
 import { DynamicLayout } from '@/themes/theme'
-import { maybeSortPostsByTopTag } from '@/lib/utils/topTagPostList'
 
 /**
  * 文章列表分页
@@ -39,12 +38,10 @@ export async function getStaticProps({ params: { page }, locale }) {
     props?.NOTION_CONFIG
   )
 
-  const allPosts = maybeSortPostsByTopTag(
+  const allPosts =
     allPages?.filter(
       page => page.type === 'Post' && page.status === 'Published'
-    ) ?? [],
-    props?.NOTION_CONFIG
-  )
+    ) ?? []
   const POSTS_PER_PAGE = siteConfig('POSTS_PER_PAGE', 12, props?.NOTION_CONFIG)
   // 处理分页
   props.posts = allPosts.slice(

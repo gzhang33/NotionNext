@@ -2,7 +2,6 @@ import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import { DynamicLayout } from '@/themes/theme'
-import { maybeSortPostsByTopTag } from '@/lib/utils/topTagPostList'
 
 /**
  * 分类页
@@ -20,12 +19,9 @@ export async function getStaticProps({ params: { category, page } }) {
   let props = await fetchGlobalAllData({ from })
 
   // 过滤状态类型
-  props.posts = maybeSortPostsByTopTag(
-    props.allPages
-      ?.filter(p => p.type === 'Post' && p.status === 'Published')
-      .filter(post => post && post.category && post.category.includes(category)),
-    props.NOTION_CONFIG
-  )
+  props.posts = props.allPages
+    ?.filter(p => p.type === 'Post' && p.status === 'Published')
+    .filter(post => post && post.category && post.category.includes(category))
   // 处理文章页数
   props.postCount = props.posts.length
   const POSTS_PER_PAGE = siteConfig('POSTS_PER_PAGE', 12, props?.NOTION_CONFIG)

@@ -8,7 +8,6 @@ import { DynamicLayout } from '@/themes/theme'
 import { generateRedirectJson } from '@/lib/utils/redirect'
 import { checkDataFromAlgolia } from '@/lib/plugins/algolia'
 import pLimit from 'p-limit'
-import { maybeSortPostsByTopTag } from '@/lib/utils/topTagPostList'
 
 /**
  * 首页布局
@@ -57,8 +56,6 @@ export async function getStaticProps(req) {
   props.posts = props.allPages?.filter(
     page => page.type === 'Post' && page.status === 'Published'
   )
-  props.posts = maybeSortPostsByTopTag(props.posts ?? [], props.NOTION_CONFIG)
-
   // 处理分页
   if (siteConfig('POST_LIST_STYLE') === 'scroll') {
     // 滚动列表默认给前端返回所有数据

@@ -4,7 +4,6 @@ import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import { DynamicLayout } from '@/themes/theme'
 import { getPageContentText } from '@/lib/db/notion/getPageContentText'
-import { maybeSortPostsByTopTag } from '@/lib/utils/topTagPostList'
 
 const Index = props => {
   const theme = siteConfig('THEME', BLOG.THEME, props.NOTION_CONFIG)
@@ -26,7 +25,6 @@ export async function getStaticProps({ params: { keyword }, locale }) {
     page => page.type === 'Post' && page.status === 'Published'
   )
   props.posts = await filterByMemCache(allPosts, keyword)
-  props.posts = maybeSortPostsByTopTag(props.posts, props.NOTION_CONFIG)
   props.postCount = props.posts.length
   const POST_LIST_STYLE = siteConfig(
     'POST_LIST_STYLE',

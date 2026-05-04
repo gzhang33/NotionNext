@@ -6,9 +6,9 @@
  * - 或在环境变量中设置 `NEXT_PUBLIC_TOP_TAG` / `TOP_TAG`
  *
  * 开启后：
- * - 仅当存在多个置顶文章时，才按最近更新时间倒序排序置顶子集
- * - 其它非置顶文章的相对顺序不变
- * - 各列表页（首页、分页、分类、标签、搜索）在分页前会将带 TOP_TAG 的文章排到当前列表最前，与全量 allPages 上的置顶逻辑配合
+ * - 在 SiteDataApi 构建 allPages 时，对「已发布 Post」整体重排：带 TOP_TAG 的排在前面；多条置顶时按最近更新时间倒序（见 lib/utils/pinnedPosts.js）
+ * - 其它非置顶文章的相对顺序在「无标签 / 同段」内保持不变
+ * - 各列表页无需单独处理，按 allPages 顺序 filter 即可
  */
 module.exports = {
   TOP_TAG: process.env.NEXT_PUBLIC_TOP_TAG || process.env.TOP_TAG || ''

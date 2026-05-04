@@ -1,6 +1,7 @@
 import {
   sortPinnedPostsByLatestUpdate,
-  sortPostsByTopTag
+  sortPostsByTopTag,
+  reorderPublishedPostsInAllPagesByTopTag
 } from '@/lib/utils/pinnedPosts'
 
 describe('sortPinnedPostsByLatestUpdate', () => {
@@ -72,6 +73,33 @@ describe('sortPostsByTopTag', () => {
     ]
     const res = sortPostsByTopTag(posts, 'top')
     expect(res.map(p => p.id)).toEqual(['P2', 'P1', 'A', 'B'])
+  })
+})
+
+describe('reorderPublishedPostsInAllPagesByTopTag', () => {
+  it('only permutes Published Post slots; leaves other rows in place', () => {
+    const menu = { id: 'M', type: 'Page', status: 'Published', slug: 'm' }
+    const a = { id: 'A', type: 'Post', status: 'Published', slug: 'a', tags: [] }
+    const p1 = {
+      id: 'P1',
+      type: 'Post',
+      status: 'Published',
+      slug: 'p1',
+      tags: ['top'],
+      lastEditedDate: '2024-01-02'
+    }
+    const p2 = {
+      id: 'P2',
+      type: 'Post',
+      status: 'Published',
+      slug: 'p2',
+      tags: ['top'],
+      lastEditedDate: '2024-03-01'
+    }
+    const allPages = [menu, a, p1, p2]
+    const res = reorderPublishedPostsInAllPagesByTopTag(allPages, 'top')
+    expect(res[0]).toBe(menu)
+    expect(res.map(p => p.id)).toEqual(['M', 'P2', 'P1', 'A'])
   })
 })
 

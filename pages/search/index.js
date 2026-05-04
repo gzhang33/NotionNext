@@ -2,7 +2,6 @@ import BLOG from '@/blog.config'
 import { siteConfig } from '@/lib/config'
 import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import { DynamicLayout } from '@/themes/theme'
-import { maybeSortPostsByTopTag } from '@/lib/utils/topTagPostList'
 import { useRouter } from 'next/router'
 
 /**
@@ -45,11 +44,8 @@ export async function getStaticProps({ locale }) {
     locale
   })
   const { allPages } = props
-  props.posts = maybeSortPostsByTopTag(
-    allPages?.filter(
-      page => page.type === 'Post' && page.status === 'Published'
-    ) ?? [],
-    props.NOTION_CONFIG
+  props.posts = allPages?.filter(
+    page => page.type === 'Post' && page.status === 'Published'
   )
   return {
     props,

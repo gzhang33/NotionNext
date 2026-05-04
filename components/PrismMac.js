@@ -72,7 +72,7 @@ const PrismMac = () => {
 
           const dispose = renderPrismMac(codeLineNumbers)
           stopLineNumbers = typeof dispose === 'function' ? dispose : () => {}
-          renderMermaid(mermaidCDN)
+          renderMermaid(mermaidCDN, isDarkMode)
           renderCollapseCode(codeCollapse, codeCollapseExpandDefault)
         } catch (err) {
           console.warn('[PrismMac] render failed:', err)
@@ -244,7 +244,7 @@ const renderCollapseCode = (codeCollapse, codeCollapseExpandDefault) => {
 /**
  * 将mermaid语言 渲染成图片
  */
-const renderMermaid = mermaidCDN => {
+const renderMermaid = (mermaidCDN, isDarkMode) => {
   const articles = getNotionArticles()
   if (!articles || articles.length === 0) return
 
@@ -276,6 +276,30 @@ const renderMermaid = mermaidCDN => {
         try {
           const mermaid = window.mermaid
           if (!mermaid) return
+          try {
+            mermaid.initialize({
+              startOnLoad: false,
+              theme: isDarkMode ? 'dark' : 'default',
+              securityLevel: 'loose',
+              themeVariables: isDarkMode
+                ? {
+                    lineColor: '#94a3b8',
+                    secondaryColor: '#64748b',
+                    tertiaryColor: '#475569',
+                    arrowheadColor: '#cbd5e1',
+                    clusterBorder: '#94a3b8',
+                    edgeLabelBackground: '#0f172a',
+                    mainBkg: '#1e293b',
+                    secondBkg: '#334155',
+                    primaryTextColor: '#f1f5f9',
+                    secondaryTextColor: '#e2e8f0',
+                    tertiaryTextColor: '#cbd5e1'
+                  }
+                : undefined
+            })
+          } catch (initErr) {
+            console.warn('[PrismMac] mermaid.initialize:', initErr)
+          }
           mermaid?.contentLoaded()
         } catch (err) {
           console.warn('[PrismMac] mermaid render failed:', err)

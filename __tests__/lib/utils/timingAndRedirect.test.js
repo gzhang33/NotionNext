@@ -132,5 +132,6 @@ describe('generateRedirectJson', () => {
     })
 
     expect(warnSpy).toHaveBeenCalledWith('无法写入文件', error)
+    warnSpy.mockRestore()
   })
 })

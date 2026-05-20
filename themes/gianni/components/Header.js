@@ -16,6 +16,7 @@ export default function Header() {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
   const { mobileNavOpen, setMobileNavOpen } = useGianniGlobal() || {}
+  const mainSite = siteConfig('LINK') // e.g. https://gianni.dev
 
   const [activeSection, setActiveSection] = useState(isHome ? '' : null)
   const [mounted, setMounted] = useState(false)
@@ -33,7 +34,6 @@ export default function Header() {
       .filter(item => item.href.startsWith('#'))
       .map(item => item.href.replace('#', ''))
 
-    // Small delay to let sections render
     const timer = setTimeout(() => {
       const sections = sectionIds
         .map(id => document.getElementById(id))
@@ -61,8 +61,6 @@ export default function Header() {
       }
 
       window.addEventListener('scroll', handleScroll, { passive: true })
-
-      // Cleanup stored on window for this scope
       window.__gianniObserver = observer
     }, 100)
 
@@ -79,7 +77,7 @@ export default function Header() {
   const handleNavClick = useCallback((e, href) => {
     if (href === '/') {
       setMobileNavOpen?.(false)
-      return // Let Next.js handle the navigation
+      return
     }
 
     if (href.startsWith('#')) {
@@ -89,21 +87,26 @@ export default function Header() {
       const targetId = href.replace('#', '')
 
       if (isHome) {
-        // Same page: smooth scroll
         const el = document.getElementById(targetId)
         if (el) el.scrollIntoView({ behavior: 'smooth' })
         setActiveSection(targetId)
       } else {
-        // Different page: navigate to home with hash, scroll after load
-        router.push('/' + href).then(() => {
-          setTimeout(() => {
-            const el = document.getElementById(targetId)
-            if (el) el.scrollIntoView({ behavior: 'smooth' })
-          }, 300)
-        })
+        // Not on home — navigate to personal website with hash
+        window.location.href = mainSite + href
       }
     }
-  }, [isHome, router, setMobileNavOpen])
+  }, [isHome, mainSite, setMobileNavOpen])
+
+  // Resolve the actual URL for a nav item's href attribute
+  const resolveHref = href => {
+    if (href === '/') return href
+    if (href.startsWith('#')) {
+      // On home: use bare hash for smooth scroll
+      // On other pages: link to personal website
+      return isHome ? href : mainSite + href
+    }
+    return href
+  }
 
   const isItemActive = item => {
     if (!mounted) return false
@@ -126,7 +129,6 @@ export default function Header() {
           aria-label="Main navigation"
           className="gianni-nav-pill w-full max-w-[680px] min-h-[4rem] px-4 sm:px-2 py-2 sm:py-1.5 flex items-center justify-between"
         >
-          {/* Logo */}
           <SmartLink
             href="/"
             onClick={e => {
@@ -141,14 +143,13 @@ export default function Header() {
             Gianni<span className="gianni-nav-dot">.</span>
           </SmartLink>
 
-          {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_ITEMS.map(item => {
               const active = isItemActive(item)
               return (
                 <a
                   key={item.label}
-                  href={item.href.startsWith('#') && !isHome ? '/' + item.href : item.href}
+                  href={resolveHref(item.href)}
                   onClick={e => handleNavClick(e, item.href)}
                   className={`gianni-nav-link ${active ? 'active' : ''}`}
                 >
@@ -158,7 +159,6 @@ export default function Header() {
             })}
           </div>
 
-          {/* Right side: hamburger only on mobile */}
           <button
             className="md:hidden flex h-11 w-11 items-center justify-center rounded-full gianni-hamburger"
             onClick={() => setMobileNavOpen?.(!mobileNavOpen)}
@@ -169,14 +169,13 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* Mobile fullscreen overlay */}
       {mobileNavOpen && (
         <div className="gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
           <div className="flex flex-col items-center gap-8">
             {NAV_ITEMS.map(item => (
               <a
                 key={item.label}
-                href={item.href.startsWith('#') && !isHome ? '/' + item.href : item.href}
+                href={resolveHref(item.href)}
                 onClick={e => handleNavClick(e, item.href)}
                 className="gianni-mobile-fullscreen-link"
               >
@@ -187,7 +186,6 @@ export default function Header() {
         </div>
       )}
 
-      {/* Spacer */}
       <div className="h-[72px]" />
     </>
   )

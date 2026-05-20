@@ -15,15 +15,14 @@ const NAV_ITEMS = [
 export default function MobileNav({ isOpen, onClose }) {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
+  const mainSite = siteConfig('LINK')
 
-  // Close on route change
   useEffect(() => {
     const handleRouteChange = () => onClose?.()
     router.events.on('routeChangeComplete', handleRouteChange)
     return () => router.events.off('routeChangeComplete', handleRouteChange)
   }, [router, onClose])
 
-  // Lock body scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -33,7 +32,6 @@ export default function MobileNav({ isOpen, onClose }) {
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  // Escape key
   useEffect(() => {
     if (!isOpen) return
     const onEscape = e => { if (e.key === 'Escape') onClose?.() }
@@ -44,7 +42,7 @@ export default function MobileNav({ isOpen, onClose }) {
   const handleNavClick = (e, href) => {
     onClose?.()
 
-    if (href === '/') return // Let Next.js handle
+    if (href === '/') return
 
     if (href.startsWith('#')) {
       e.preventDefault()
@@ -54,14 +52,15 @@ export default function MobileNav({ isOpen, onClose }) {
         const el = document.getElementById(targetId)
         if (el) el.scrollIntoView({ behavior: 'smooth' })
       } else {
-        router.push('/' + href).then(() => {
-          setTimeout(() => {
-            const el = document.getElementById(targetId)
-            if (el) el.scrollIntoView({ behavior: 'smooth' })
-          }, 300)
-        })
+        window.location.href = mainSite + href
       }
     }
+  }
+
+  const resolveHref = href => {
+    if (href === '/') return href
+    if (href.startsWith('#')) return isHome ? href : mainSite + href
+    return href
   }
 
   if (!isOpen) return null
@@ -72,7 +71,7 @@ export default function MobileNav({ isOpen, onClose }) {
         {NAV_ITEMS.map(item => (
           <a
             key={item.label}
-            href={item.href.startsWith('#') && !isHome ? '/' + item.href : item.href}
+            href={resolveHref(item.href)}
             onClick={e => handleNavClick(e, item.href)}
             className="gianni-mobile-fullscreen-link"
           >

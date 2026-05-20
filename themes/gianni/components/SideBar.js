@@ -1,4 +1,5 @@
 import { siteConfig } from '@/lib/config'
+import SmartLink from '@/components/SmartLink'
 import Announcement from './Announcement'
 import Catalog from './Catalog'
 
@@ -6,7 +7,7 @@ export default function SideBar(props) {
   const { notice, categories, tags } = props
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4' style={{ position: 'sticky', top: 'calc(var(--header-height) + 1rem)', alignSelf: 'start' }}>
       <div className='gianni-sidebar-widget'>
         <div className='flex items-center gap-3 mb-2'>
           <img
@@ -30,18 +31,19 @@ export default function SideBar(props) {
 
       {categories && categories.length > 0 && (
         <div className='gianni-sidebar-widget'>
-          <div className='text-[10px] uppercase tracking-wider mb-2 font-medium' style={{ color: 'var(--text-muted)' }}>
+          <div className='gianni-section-title'>
+            <i className='fas fa-folder mr-1' />
             Categories
           </div>
           <div className='flex flex-wrap gap-1'>
             {categories.map(c => (
-              <a
+              <SmartLink
                 key={c.name}
-                href={`/category/${c.name}`}
-                className='text-[10px] px-2 py-0.5 rounded-full transition-all duration-200'
-                style={{ color: 'var(--text-secondary)', border: '1px solid var(--border)' }}>
+                href={`/category/${encodeURIComponent(c.name)}`}
+                className='gianni-tag'
+                style={{ fontSize: '10px', padding: '3px 10px' }}>
                 {c.name}({c.count})
-              </a>
+              </SmartLink>
             ))}
           </div>
         </div>
@@ -49,18 +51,18 @@ export default function SideBar(props) {
 
       {tags && tags.length > 0 && (
         <div className='gianni-sidebar-widget'>
-          <div className='text-[10px] uppercase tracking-wider mb-2 font-medium' style={{ color: 'var(--text-muted)' }}>
+          <div className='gianni-section-title'>
+            <i className='fas fa-tag mr-1' />
             Tags
           </div>
           <div className='flex flex-wrap gap-1'>
             {tags.map(t => (
-              <a
+              <SmartLink
                 key={t.name}
                 href={`/tag/${encodeURIComponent(t.name)}`}
-                className='text-[10px] px-2 py-0.5 rounded-full transition-all duration-200'
-                style={{ color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+                className='gianni-tag'>
                 {t.name}
-              </a>
+              </SmartLink>
             ))}
           </div>
         </div>

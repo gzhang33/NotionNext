@@ -26,7 +26,8 @@ export const MenuList = ({ customNav, customMenu }) => {
 
   useEffect(() => {
     router.events.on('routeChangeStart', closeMenu)
-  })
+    return () => router.events.off('routeChangeStart', closeMenu)
+  }, [router])
 
   let links = [
     {

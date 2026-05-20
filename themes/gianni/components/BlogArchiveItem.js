@@ -1,36 +1,48 @@
 import SmartLink from '@/components/SmartLink'
 
-/**
- * 归档分组文章
- * @param {*} param0
- * @returns
- */
-export default function BlogArchiveItem({ archiveTitle, archivePosts }) {
+export default function BlogArchiveItem({ archiveTitle, archivePosts, index = 0, animate = false }) {
+  const animStyle = animate ? { animationDelay: `${index * 80}ms` } : {}
+
   return (
-    <div key={archiveTitle}>
-      <div id={archiveTitle} className='pt-16 pb-4 text-3xl dark:text-gray-300'>
+    <div className={animate ? 'gianni-animate-in' : ''} style={animStyle}>
+      <div
+        id={archiveTitle}
+        className='pt-10 pb-3 text-xl font-bold'
+        style={{
+          fontFamily: "'Syne', sans-serif",
+          color: 'var(--text)',
+          borderLeft: '3px solid var(--accent)',
+          paddingLeft: '12px'
+        }}>
         {archiveTitle}
       </div>
 
-      <ul>
-        {archivePosts[archiveTitle].map(post => {
-          return (
-            <li
-              key={post.id}
-              className='border-l-2 p-1 text-xs md:text-base items-center  hover:scale-x-105 hover:border-gray-500 dark:hover:border-gray-300 dark:border-gray-400 transform duration-500'>
-              <div id={post?.publishDay}>
-                <span className='text-gray-400'>{post.date?.start_date}</span>{' '}
-                &nbsp;
-                <SmartLink
-                  href={post?.href}
-                  passHref
-                  className='dark:text-gray-400  dark:hover:text-gray-300 overflow-x-hidden hover:underline cursor-pointer text-gray-600'>
+      <ul className='space-y-0'>
+        {archivePosts[archiveTitle].map((post, i) => (
+          <li
+            key={post.id}
+            className='gianni-timeline-item flex gap-3.5 pb-4 relative cursor-pointer'
+            style={animate ? { animationDelay: `${(index * 80) + (i * 40)}ms` } : {}}>
+
+            <div className='flex-shrink-0 flex flex-col items-center w-5 relative'>
+              <div className='gianni-timeline-dot mt-1' />
+              <div className='gianni-timeline-line' />
+            </div>
+
+            <div className='flex-1 min-w-0'>
+              {post.date?.start_date && (
+                <div className='text-[10px] font-mono tracking-wider' style={{ color: 'var(--text-muted)' }}>
+                  {post.date.start_date}
+                </div>
+              )}
+              <SmartLink href={post?.href}>
+                <div className='text-sm font-medium leading-tight' style={{ color: 'var(--text-secondary)', transition: 'color var(--transition-fast)' }}>
                   {post.title}
-                </SmartLink>
-              </div>
-            </li>
-          )
-        })}
+                </div>
+              </SmartLink>
+            </div>
+          </li>
+        ))}
       </ul>
     </div>
   )

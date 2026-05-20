@@ -1,5 +1,7 @@
 import { siteConfig } from '@/lib/config'
 import SmartLink from '@/components/SmartLink'
+import LazyImage from '@/components/LazyImage'
+import CONFIG from '../config'
 
 function formatShortDate(dateStr) {
   if (!dateStr) return ''
@@ -10,18 +12,36 @@ function formatShortDate(dateStr) {
 }
 
 export const BlogItem = props => {
-  const { post } = props
+  const { post, index = 0, animate = false } = props
   const dateStr = post.publishDay || post.date?.start_date
   const formattedDate = formatShortDate(dateStr)
+  const showCover = siteConfig('GIANNI_POST_COVER_ENABLE', null, CONFIG) && post.pageCoverThumbnail
+  const animStyle = animate ? { animationDelay: `${index * 60}ms` } : {}
 
   return (
-    <div className="gianni-timeline-item flex gap-3.5 pb-6 cursor-pointer relative">
+    <div
+      className={`gianni-timeline-item flex gap-3.5 pb-6 cursor-pointer relative ${animate ? 'gianni-animate-in' : ''}`}
+      style={animStyle}>
+
       <div className="flex-shrink-0 flex flex-col items-center w-5 relative">
         <div className="gianni-timeline-dot mt-1.5"></div>
         <div className="gianni-timeline-line"></div>
       </div>
 
       <div className="flex-1 min-w-0">
+        {showCover && (
+          <SmartLink href={post.href}>
+            <div className="mb-2 overflow-hidden" style={{ borderRadius: 'var(--cover-radius)' }}>
+              <LazyImage
+                src={post.pageCoverThumbnail}
+                alt={post.title}
+                className='w-full h-32 object-cover transition-transform'
+                style={{ transitionDuration: 'var(--transition-base)' }}
+              />
+            </div>
+          </SmartLink>
+        )}
+
         {formattedDate && (
           <div className="text-[10px] font-mono tracking-wider" style={{ color: 'var(--text-muted)' }}>
             {formattedDate}
@@ -43,9 +63,7 @@ export const BlogItem = props => {
         {post?.tags?.length > 0 && (
           <div className="flex gap-1.5 mt-1.5 flex-wrap">
             {post.tags.map(t => (
-              <span key={t} className="text-[9px] px-2 py-0.5 rounded-full" style={{ color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
-                {t}
-              </span>
+              <span key={t} className="gianni-tag">{t}</span>
             ))}
           </div>
         )}

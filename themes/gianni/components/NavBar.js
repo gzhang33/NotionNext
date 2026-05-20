@@ -12,7 +12,7 @@ export default function NavBar(props) {
 
   const toggleSearch = () => {
     if (siteConfig('ALGOLIA_APP_ID')) {
-      searchModal.current.openSearch()
+      searchModal?.current?.openSearch?.()
     } else {
       setShowSearchInput(!showSearchInput)
     }
@@ -28,7 +28,7 @@ export default function NavBar(props) {
   const pills = [
     { label: 'Latest', href: '/', show: true },
     { label: 'Archive', href: '/archive', show: siteConfig('GIANNI_MENU_ARCHIVE', null, CONFIG) },
-    { label: 'Tags', href: '/tags', show: siteConfig('GIANNI_MENU_TAG', null, CONFIG) },
+    { label: 'Tags', href: '/tag', show: siteConfig('GIANNI_MENU_TAG', null, CONFIG) },
     { label: 'Categories', href: '/category', show: siteConfig('GIANNI_MENU_CATEGORY', null, CONFIG) }
   ].filter(p => p.show)
 
@@ -39,7 +39,7 @@ export default function NavBar(props) {
   }
 
   return (
-    <div className='max-w-[1100px] mx-auto mt-7 px-8 flex gap-2 flex-wrap items-center'>
+    <div className='hidden md:flex max-w-[1100px] mx-auto mt-4 px-8 gap-2 flex-wrap items-center'>
       {pills.map(pill => (
         <SmartLink
           key={pill.href}

@@ -8,7 +8,7 @@ import { Transition } from '@headlessui/react'
 import dynamic from 'next/dynamic'
 import SmartLink from '@/components/SmartLink'
 import { useRouter } from 'next/router'
-import { createContext, useContext, useEffect, useRef } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import BlogPostBar from './components/BlogPostBar'
 import CONFIG from './config'
 import { Style } from './style'
@@ -31,10 +31,12 @@ const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
 const JumpToTopButton = dynamic(() => import('./components/JumpToTopButton'), { ssr: false })
 const Footer = dynamic(() => import('./components/Footer'), { ssr: false })
 const SearchInput = dynamic(() => import('./components/SearchInput'), { ssr: false })
-const WWAds = dynamic(() => import('@/components/WWAds'), { ssr: false })
+const WWads = dynamic(() => import('@/components/WWAds'), { ssr: false })
 const BlogListPage = dynamic(() => import('./components/BlogListPage'), { ssr: false })
 const RecommendPosts = dynamic(() => import('./components/RecommendPosts'), { ssr: false })
 const Catalog = dynamic(() => import('./components/Catalog'), { ssr: false })
+const ReadingProgress = dynamic(() => import('./components/ReadingProgress'), { ssr: false })
+const MobileNav = dynamic(() => import('./components/MobileNav'), { ssr: false })
 
 const ThemeGlobalGianni = createContext()
 export const useGianniGlobal = () => useContext(ThemeGlobalGianni)
@@ -43,15 +45,18 @@ const LayoutBase = props => {
   const { children, slotTop } = props
   const { onLoading, fullWidth } = useGlobal()
   const searchModal = useRef(null)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   return (
-    <ThemeGlobalGianni.Provider value={{ searchModal }}>
+    <ThemeGlobalGianni.Provider value={{ searchModal, mobileNavOpen, setMobileNavOpen }}>
       <div
         id='theme-gianni'
         className={`${siteConfig('FONT_STYLE')} min-h-screen flex flex-col scroll-smooth`}>
         <Style />
+        <ReadingProgress />
         <Header {...props} />
         <NavBar {...props} />
+        <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
         <div
           id='container-wrapper'
@@ -61,22 +66,17 @@ const LayoutBase = props => {
             gridTemplateColumns: fullWidth ? '1fr' : '1fr 280px',
             gap: '3rem'
           }}>
-          <style>{`
-            @media (max-width: 900px) {
-              #container-wrapper { grid-template-columns: 1fr !important; }
-            }
-          `}</style>
 
           <div id='container-inner' className='min-h-fit'>
             <Transition
               show={!onLoading}
               appear={true}
-              enter='transition ease-in-out duration-700 transform order-first'
-              enterFrom='opacity-0 translate-y-16'
+              enter='transition ease-out duration-500 transform order-first'
+              enterFrom='opacity-0 translate-y-8'
               enterTo='opacity-100'
-              leave='transition ease-in-out duration-300 transform'
+              leave='transition ease-in duration-300 transform'
               leaveFrom='opacity-100 translate-y-0'
-              leaveTo='opacity-0 -translate-y-16'
+              leaveTo='opacity-0 -translate-y-8'
               unmount={false}>
               {slotTop}
               {children}
@@ -85,7 +85,7 @@ const LayoutBase = props => {
           </div>
 
           {!fullWidth && (
-            <div id='right-sidebar' className='hidden max-[900px]:hidden'>
+            <div id='right-sidebar'>
               <SideBar {...props} />
             </div>
           )}
@@ -132,10 +132,18 @@ const LayoutSearch = props => {
 
 const LayoutArchive = props => {
   const { archivePosts } = props
+  const animate = siteConfig('GIANNI_ANIMATE_LISTS', null, CONFIG)
+
   return (
     <div className='mb-10 pb-20 md:py-12 p-3 min-h-screen w-full'>
-      {Object.keys(archivePosts).map(archiveTitle => (
-        <BlogArchiveItem key={archiveTitle} archiveTitle={archiveTitle} archivePosts={archivePosts} />
+      {Object.keys(archivePosts).map((archiveTitle, i) => (
+        <BlogArchiveItem
+          key={archiveTitle}
+          archiveTitle={archiveTitle}
+          archivePosts={archivePosts}
+          index={i}
+          animate={animate}
+        />
       ))}
     </div>
   )
@@ -151,7 +159,7 @@ const LayoutSlug = props => {
       {!lock && post && (
         <div className='max-w-none'>
           <ArticleInfo post={post} />
-          <WWAds orientation='horizontal' className='w-full' />
+          <WWads orientation='horizontal' className='w-full' />
           <div id='article-wrapper'>
             {!lock && <NotionPage post={post} />}
           </div>
@@ -195,15 +203,20 @@ const Layout404 = props => {
 const LayoutCategoryIndex = props => {
   const { categoryOptions } = props
   return (
-    <div id='category-list' className='duration-200 flex flex-wrap'>
-      {categoryOptions?.map(category => (
-        <SmartLink key={category.name} href={`/category/${category.name}`} passHref legacyBehavior>
-          <div className='px-5 cursor-pointer py-2 hover:opacity-80 transition-opacity' style={{ color: 'var(--text-secondary)' }}>
-            <i className='mr-4 fas fa-folder' />
-            {category.name}({category.count})
-          </div>
-        </SmartLink>
-      ))}
+    <div className='mb-6 pb-4' style={{ borderBottom: '1px solid var(--divider)' }}>
+      <div className='gianni-section-title'>
+        <i className='fas fa-folder mr-1' />
+        Categories
+      </div>
+      <div className='flex flex-wrap gap-2 mt-2'>
+        {categoryOptions?.map(category => (
+          <SmartLink key={category.name} href={`/category/${encodeURIComponent(category.name)}`}>
+            <span className='gianni-tag' style={{ fontSize: '10px', padding: '4px 12px' }}>
+              {category.name}({category.count})
+            </span>
+          </SmartLink>
+        ))}
+      </div>
     </div>
   )
 }
@@ -211,17 +224,20 @@ const LayoutCategoryIndex = props => {
 const LayoutTagIndex = props => {
   const { tagOptions } = props
   return (
-    <div id='tags-list' className='duration-200 flex flex-wrap'>
-      {tagOptions.map(tag => (
-        <div key={tag.name} className='p-2'>
-          <SmartLink key={tag} href={`/tag/${encodeURIComponent(tag.name)}`} passHref className='gianni-pill'>
-            <div className='font-light'>
-              <i className='mr-1 fas fa-tag' />{' '}
-              {tag.name + (tag.count ? `(${tag.count})` : '')}
-            </div>
+    <div className='mb-6 pb-4' style={{ borderBottom: '1px solid var(--divider)' }}>
+      <div className='gianni-section-title'>
+        <i className='fas fa-tag mr-1' />
+        Tags
+      </div>
+      <div className='flex flex-wrap gap-2 mt-2'>
+        {tagOptions.map(tag => (
+          <SmartLink key={tag.name} href={`/tag/${encodeURIComponent(tag.name)}`}>
+            <span className='gianni-tag' style={{ fontSize: '10px', padding: '4px 12px' }}>
+              {tag.name}{tag.count ? `(${tag.count})` : ''}
+            </span>
           </SmartLink>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

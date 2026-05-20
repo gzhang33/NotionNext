@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 
 export default function MobileNav({ isOpen, onClose }) {
   const router = useRouter()
-  const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
+  const realIsHome = router.asPath === '/' || router.asPath.startsWith('/?') || router.asPath.startsWith('/page/')
 
   useEffect(() => {
     const handleRouteChange = () => onClose?.()
@@ -42,12 +42,16 @@ export default function MobileNav({ isOpen, onClose }) {
     onClose?.()
 
     if (href === '/') {
-      router.push('/')
+      if (realIsHome) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        router.push('/')
+      }
       return
     }
 
     if (href.startsWith('/#')) {
-      if (isHome) {
+      if (realIsHome) {
         const el = document.getElementById(href.replace('/#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
       } else {

@@ -15,6 +15,9 @@ const NAV_ITEMS = [
 export default function Header() {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
+  // When proxied behind /blog, router.pathname is "/" but the real URL is /blog.
+  // Use asPath to detect the actual path.
+  const realIsHome = router.asPath === '/' || router.asPath.startsWith('/?') || router.asPath.startsWith('/page/')
   const { mobileNavOpen, setMobileNavOpen } = useGianniGlobal() || {}
 
   const [activeSection, setActiveSection] = useState(isHome ? '' : null)
@@ -78,36 +81,39 @@ export default function Header() {
   }, [isHome])
 
   const handleNavClick = useCallback((e, href) => {
-    e.preventDefault()
-    e.stopPropagation()
     setMobileNavOpen?.(false)
 
     if (href === '/') {
-      router.push('/')
+      if (realIsHome) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        router.push('/')
+      }
       return
     }
 
     if (href.startsWith('/#')) {
-      if (isHome) {
+      if (realIsHome) {
         const el = document.getElementById(href.replace('/#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
         setActiveSection(href.replace('/#', ''))
       } else {
+        // Full-page navigation back to personal site
         const target = href
         setTimeout(() => { window.location.href = target }, 0)
       }
     }
-  }, [isHome, setMobileNavOpen, router])
+  }, [realIsHome, setMobileNavOpen, router])
 
   const isItemActive = item => {
     if (!mounted) return false
     if (item.href === '/') {
-      return !isHome ? false : activeSection === '' && router.pathname === '/'
+      return realIsHome && activeSection === ''
     }
     if (item.href.startsWith('/#')) {
-      return isHome && activeSection === item.href.replace('/#', '')
+      return realIsHome && activeSection === item.href.replace('/#', '')
     }
-    return router.pathname.startsWith(item.href)
+    return router.asPath.startsWith(item.href)
   }
 
   return (
@@ -123,7 +129,7 @@ export default function Header() {
           <SmartLink
             href="/"
             onClick={e => {
-              if (isHome) {
+              if (realIsHome) {
                 e.preventDefault()
                 window.scrollTo({ top: 0, behavior: 'smooth' })
               }

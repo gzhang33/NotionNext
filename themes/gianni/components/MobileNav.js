@@ -44,17 +44,12 @@ export default function MobileNav({ isOpen, onClose }) {
 
     if (href === '/') return
 
-    if (href.startsWith('#')) {
+    if (href.startsWith('#') && isHome) {
       e.preventDefault()
-      const targetId = href.replace('#', '')
-
-      if (isHome) {
-        const el = document.getElementById(targetId)
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      } else {
-        window.location.href = mainSite + href
-      }
+      const el = document.getElementById(href.replace('#', ''))
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
     }
+    // On non-home, let the <a> tag's href (mainSite + hash) handle navigation natively
   }
 
   const resolveHref = href => {

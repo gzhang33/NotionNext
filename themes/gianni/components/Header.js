@@ -61,16 +61,20 @@ export default function Header() {
       }
 
       window.addEventListener('scroll', handleScroll, { passive: true })
+      window.__gianniScrollHandler = handleScroll
       window.__gianniObserver = observer
     }, 100)
 
     return () => {
       clearTimeout(timer)
+      if (window.__gianniScrollHandler) {
+        window.removeEventListener('scroll', window.__gianniScrollHandler)
+        window.__gianniScrollHandler = null
+      }
       if (window.__gianniObserver) {
         window.__gianniObserver.disconnect()
         window.__gianniObserver = null
       }
-      window.removeEventListener('scroll', window.__gianniScrollHandler)
     }
   }, [isHome])
 
@@ -81,21 +85,17 @@ export default function Header() {
     }
 
     if (href.startsWith('#')) {
-      e.preventDefault()
       setMobileNavOpen?.(false)
 
-      const targetId = href.replace('#', '')
-
       if (isHome) {
-        const el = document.getElementById(targetId)
+        e.preventDefault()
+        const el = document.getElementById(href.replace('#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
-        setActiveSection(targetId)
-      } else {
-        // Not on home — navigate to personal website with hash
-        window.location.href = mainSite + href
+        setActiveSection(href.replace('#', ''))
       }
+      // On non-home, let the <a> tag's href (mainSite + hash) handle navigation natively
     }
-  }, [isHome, mainSite, setMobileNavOpen])
+  }, [isHome, setMobileNavOpen])
 
   // Resolve the actual URL for a nav item's href attribute
   const resolveHref = href => {

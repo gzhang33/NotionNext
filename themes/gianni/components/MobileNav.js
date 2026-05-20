@@ -43,10 +43,15 @@ export default function MobileNav({ isOpen, onClose }) {
 
     if (href === '/') return
 
-    if (href.startsWith('/#') && isHome) {
+    if (href.startsWith('/#')) {
       e.preventDefault()
-      const el = document.getElementById(href.replace('/#', ''))
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
+
+      if (isHome) {
+        const el = document.getElementById(href.replace('/#', ''))
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        window.location.href = href
+      }
     }
   }
 

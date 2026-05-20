@@ -84,16 +84,18 @@ export default function Header() {
     }
 
     if (href.startsWith('/#')) {
+      e.preventDefault()
       setMobileNavOpen?.(false)
 
       if (isHome) {
-        // Same page: smooth scroll to section
-        e.preventDefault()
         const el = document.getElementById(href.replace('/#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
         setActiveSection(href.replace('/#', ''))
+      } else {
+        // Force full page navigation to leave the NotionNext SPA
+        // Next.js client router would otherwise intercept <a href="/">
+        window.location.href = href
       }
-      // On non-home, let <a href="/#about"> navigate to site root + scroll to section
     }
   }, [isHome, setMobileNavOpen])
 

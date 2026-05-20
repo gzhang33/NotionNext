@@ -1,9 +1,8 @@
 import { siteConfig } from '@/lib/config'
 import SmartLink from '@/components/SmartLink'
-import DarkModeButton from '@/components/DarkModeButton'
 import CONFIG from '../config'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useGianniGlobal } from '..'
 
 const NAV_ITEMS = [
@@ -13,80 +12,112 @@ const NAV_ITEMS = [
   { label: 'Contact', href: '#contact' }
 ]
 
-export default function Header(props) {
+export default function Header() {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
   const { mobileNavOpen, setMobileNavOpen } = useGianniGlobal() || {}
 
-  const [activeSection, setActiveSection] = useState('')
-  const [scrollY, setScrollY] = useState(0)
+  const [activeSection, setActiveSection] = useState(isHome ? '' : null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   // IntersectionObserver for hash-based active section (only on home)
   useEffect(() => {
-    if (!isHome) return
+    if (!isHome) {
+      setActiveSection(null)
+      return
+    }
 
     const sectionIds = NAV_ITEMS
       .filter(item => item.href.startsWith('#'))
       .map(item => item.href.replace('#', ''))
 
-    const sections = sectionIds
-      .map(id => document.getElementById(id))
-      .filter(Boolean)
+    // Small delay to let sections render
+    const timer = setTimeout(() => {
+      const sections = sectionIds
+        .map(id => document.getElementById(id))
+        .filter(Boolean)
 
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id)
-          }
-        })
-      },
-      { rootMargin: '-40% 0px -50% 0px' }
-    )
+      if (sections.length === 0) return
 
-    const handleScroll = () => {
-      const y = window.scrollY
-      setScrollY(y)
-      const nearBottom = window.innerHeight + y >= document.body.scrollHeight - 80
-      if (nearBottom) setActiveSection('contact')
-    }
+      const observer = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              setActiveSection(entry.target.id)
+            }
+          })
+        },
+        { rootMargin: '-40% 0px -50% 0px' }
+      )
 
-    sections.forEach(s => observer.observe(s))
-    window.addEventListener('scroll', handleScroll, { passive: true })
+      sections.forEach(s => observer.observe(s))
+
+      const handleScroll = () => {
+        const y = window.scrollY
+        const nearBottom = window.innerHeight + y >= document.body.scrollHeight - 80
+        if (nearBottom) setActiveSection('contact')
+      }
+
+      window.addEventListener('scroll', handleScroll, { passive: true })
+
+      // Cleanup stored on window for this scope
+      window.__gianniObserver = observer
+    }, 100)
+
     return () => {
-      observer.disconnect()
-      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(timer)
+      if (window.__gianniObserver) {
+        window.__gianniObserver.disconnect()
+        window.__gianniObserver = null
+      }
+      window.removeEventListener('scroll', window.__gianniScrollHandler)
     }
   }, [isHome])
 
-  const handleNavClick = (e, href) => {
-    if (href.startsWith('#')) {
-      // Hash links: scroll on home, navigate to home#hash from other pages
-      if (isHome) {
-        e.preventDefault()
-        const el = document.getElementById(href.replace('#', ''))
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      }
+  const handleNavClick = useCallback((e, href) => {
+    if (href === '/') {
       setMobileNavOpen?.(false)
-    } else {
-      setMobileNavOpen?.(false)
+      return // Let Next.js handle the navigation
     }
-  }
+
+    if (href.startsWith('#')) {
+      e.preventDefault()
+      setMobileNavOpen?.(false)
+
+      const targetId = href.replace('#', '')
+
+      if (isHome) {
+        // Same page: smooth scroll
+        const el = document.getElementById(targetId)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+        setActiveSection(targetId)
+      } else {
+        // Different page: navigate to home with hash, scroll after load
+        router.push('/' + href).then(() => {
+          setTimeout(() => {
+            const el = document.getElementById(targetId)
+            if (el) el.scrollIntoView({ behavior: 'smooth' })
+          }, 300)
+        })
+      }
+    }
+  }, [isHome, router, setMobileNavOpen])
 
   const isItemActive = item => {
+    if (!mounted) return false
     if (item.href === '/') {
       return !isHome ? false : activeSection === '' && router.pathname === '/'
     }
     if (item.href.startsWith('#')) {
-      const sectionId = item.href.replace('#', '')
-      return isHome && activeSection === sectionId
+      return isHome && activeSection === item.href.replace('#', '')
     }
     return router.pathname.startsWith(item.href)
   }
 
   return (
     <>
-      {/* Desktop + Mobile floating pill navbar */}
       <div
         className="fixed inset-x-0 top-0 z-50 flex justify-center px-3 sm:px-4"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
@@ -115,22 +146,19 @@ export default function Header(props) {
             {NAV_ITEMS.map(item => {
               const active = isItemActive(item)
               return (
-                <SmartLink
+                <a
                   key={item.label}
-                  href={item.href}
+                  href={item.href.startsWith('#') && !isHome ? '/' + item.href : item.href}
                   onClick={e => handleNavClick(e, item.href)}
                   className={`gianni-nav-link ${active ? 'active' : ''}`}
                 >
                   {item.label}
-                </SmartLink>
+                </a>
               )
             })}
           </div>
 
-          {/* Dark mode toggle */}
-          <DarkModeButton className="hidden md:flex mr-1" />
-
-          {/* Mobile hamburger */}
+          {/* Right side: hamburger only on mobile */}
           <button
             className="md:hidden flex h-11 w-11 items-center justify-center rounded-full gianni-hamburger"
             onClick={() => setMobileNavOpen?.(!mobileNavOpen)}
@@ -143,23 +171,23 @@ export default function Header(props) {
 
       {/* Mobile fullscreen overlay */}
       {mobileNavOpen && (
-        <div className="gianni-mobile-fullscreen md:hidden">
-          <div className="gianni-mobile-fullscreen-links">
+        <div className="gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
+          <div className="flex flex-col items-center gap-8">
             {NAV_ITEMS.map(item => (
-              <SmartLink
+              <a
                 key={item.label}
-                href={item.href}
+                href={item.href.startsWith('#') && !isHome ? '/' + item.href : item.href}
                 onClick={e => handleNavClick(e, item.href)}
                 className="gianni-mobile-fullscreen-link"
               >
                 {item.label}
-              </SmartLink>
+              </a>
             ))}
           </div>
         </div>
       )}
 
-      {/* Spacer so content isn't hidden behind fixed nav */}
+      {/* Spacer */}
       <div className="h-[72px]" />
     </>
   )

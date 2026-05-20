@@ -37,6 +37,7 @@ const RecommendPosts = dynamic(() => import('./components/RecommendPosts'), { ss
 const Catalog = dynamic(() => import('./components/Catalog'), { ssr: false })
 const ReadingProgress = dynamic(() => import('./components/ReadingProgress'), { ssr: false })
 const MobileNav = dynamic(() => import('./components/MobileNav'), { ssr: false })
+const ThemeToggle = dynamic(() => import('./components/ThemeToggle'), { ssr: false })
 
 const ThemeGlobalGianni = createContext()
 export const useGianniGlobal = () => useContext(ThemeGlobalGianni)
@@ -55,6 +56,7 @@ const LayoutBase = props => {
         <Style />
         <ReadingProgress />
         <Header {...props} />
+        <ThemeToggle />
         <NavBar {...props} />
         <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 

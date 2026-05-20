@@ -78,16 +78,38 @@ const Style = () => {
     }
     #theme-gianni .blog-item-title:hover { color: var(--accent); }
 
+    #theme-gianni .gianni-theme-toggle {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      transition: all var(--transition-fast);
+    }
+    #theme-gianni .gianni-theme-toggle:hover {
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-sm);
+    }
+
     /* ── Navbar (floating pill) ── */
     #theme-gianni .gianni-nav-pill {
-      background: var(--bg);
-      border: 1px solid var(--glass-border);
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,0.05);
       border-radius: 1.5rem;
       box-shadow: 0 18px 42px rgba(0,0,0,0.18);
       transition: box-shadow var(--transition-base);
     }
+    @media (min-width: 640px) {
+      #theme-gianni .gianni-nav-pill {
+        border-radius: 9999px;
+      }
+    }
     .light #theme-gianni .gianni-nav-pill {
       background: #1a1a1a;
+      border-color: rgba(255,255,255,0.05);
     }
     #theme-gianni .gianni-nav-logo {
       font-family: 'Syne', sans-serif;
@@ -95,6 +117,7 @@ const Style = () => {
       font-size: 13px;
       letter-spacing: -0.02em;
       color: rgba(255,255,255,0.85);
+      text-decoration: none;
     }
     .light #theme-gianni .gianni-nav-logo {
       color: #fff;
@@ -103,6 +126,7 @@ const Style = () => {
       color: var(--accent);
     }
     #theme-gianni .gianni-nav-link {
+      display: inline-block;
       border-radius: 9999px;
       padding: 8px 16px;
       font-size: 12px;
@@ -110,6 +134,8 @@ const Style = () => {
       letter-spacing: 0.02em;
       transition: all 200ms;
       color: rgba(255,255,255,0.4);
+      text-decoration: none;
+      cursor: pointer;
     }
     .light #theme-gianni .gianni-nav-link {
       color: rgba(255,255,255,0.5);
@@ -117,6 +143,9 @@ const Style = () => {
     #theme-gianni .gianni-nav-link:hover {
       color: rgba(255,255,255,1);
       background: rgba(255,255,255,0.08);
+    }
+    #theme-gianni .gianni-nav-link:active {
+      transform: scale(0.95);
     }
     #theme-gianni .gianni-nav-link.active {
       background: var(--accent);
@@ -129,6 +158,9 @@ const Style = () => {
     #theme-gianni .gianni-hamburger:hover {
       background: rgba(255,255,255,0.1);
     }
+    #theme-gianni .gianni-hamburger:active {
+      transform: scale(0.9);
+    }
     #theme-gianni .gianni-hamburger-icon {
       font-size: 18px;
     }
@@ -138,6 +170,8 @@ const Style = () => {
       background: rgba(26,26,26,0.95);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
+      position: fixed;
+      inset: 0;
     }
     .light #theme-gianni .gianni-mobile-fullscreen-backdrop {
       background: rgba(26,26,26,0.95);
@@ -149,12 +183,14 @@ const Style = () => {
       color: rgba(255,255,255,0.9);
       padding: 8px 0;
       transition: color 200ms, transform 200ms;
+      text-decoration: none;
     }
     #theme-gianni .gianni-mobile-fullscreen-link:hover {
       color: var(--accent);
     }
     #theme-gianni .gianni-mobile-fullscreen-link:active {
       transform: scale(0.95);
+      background: rgba(255,255,255,0.05);
     }
 
     /* ── Pills & Tags ── */

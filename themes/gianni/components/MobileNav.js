@@ -2,7 +2,7 @@ import { siteConfig } from '@/lib/config'
 import SmartLink from '@/components/SmartLink'
 import CONFIG from '../config'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useGianniGlobal } from '..'
 
 const NAV_ITEMS = [
@@ -15,7 +15,6 @@ const NAV_ITEMS = [
 export default function MobileNav({ isOpen, onClose }) {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
-  const { mobileNavOpen, setMobileNavOpen } = useGianniGlobal() || {}
 
   // Close on route change
   useEffect(() => {
@@ -43,28 +42,42 @@ export default function MobileNav({ isOpen, onClose }) {
   }, [isOpen, onClose])
 
   const handleNavClick = (e, href) => {
-    if (href.startsWith('#') && isHome) {
-      e.preventDefault()
-      const el = document.getElementById(href.replace('#', ''))
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
-    }
     onClose?.()
+
+    if (href === '/') return // Let Next.js handle
+
+    if (href.startsWith('#')) {
+      e.preventDefault()
+      const targetId = href.replace('#', '')
+
+      if (isHome) {
+        const el = document.getElementById(targetId)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        router.push('/' + href).then(() => {
+          setTimeout(() => {
+            const el = document.getElementById(targetId)
+            if (el) el.scrollIntoView({ behavior: 'smooth' })
+          }, 300)
+        })
+      }
+    }
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
+    <div className="gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
       <div className="flex flex-col items-center gap-8">
         {NAV_ITEMS.map(item => (
-          <SmartLink
+          <a
             key={item.label}
-            href={item.href}
+            href={item.href.startsWith('#') && !isHome ? '/' + item.href : item.href}
             onClick={e => handleNavClick(e, item.href)}
             className="gianni-mobile-fullscreen-link"
           >
             {item.label}
-          </SmartLink>
+          </a>
         ))}
       </div>
     </div>

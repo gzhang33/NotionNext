@@ -6,16 +6,15 @@ import { useEffect } from 'react'
 import { useGianniGlobal } from '..'
 
 const NAV_ITEMS = [
-  { label: 'About', href: '#about' },
-  { label: 'Projects', href: '#projects' },
+  { label: 'About', href: '/#about' },
+  { label: 'Projects', href: '/#projects' },
   { label: 'Blog', href: '/' },
-  { label: 'Contact', href: '#contact' }
+  { label: 'Contact', href: '/#contact' }
 ]
 
 export default function MobileNav({ isOpen, onClose }) {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
-  const mainSite = siteConfig('LINK')
 
   useEffect(() => {
     const handleRouteChange = () => onClose?.()
@@ -44,18 +43,11 @@ export default function MobileNav({ isOpen, onClose }) {
 
     if (href === '/') return
 
-    if (href.startsWith('#') && isHome) {
+    if (href.startsWith('/#') && isHome) {
       e.preventDefault()
-      const el = document.getElementById(href.replace('#', ''))
+      const el = document.getElementById(href.replace('/#', ''))
       if (el) el.scrollIntoView({ behavior: 'smooth' })
     }
-    // On non-home, let the <a> tag's href (mainSite + hash) handle navigation natively
-  }
-
-  const resolveHref = href => {
-    if (href === '/') return href
-    if (href.startsWith('#')) return isHome ? href : mainSite + href
-    return href
   }
 
   if (!isOpen) return null
@@ -66,7 +58,7 @@ export default function MobileNav({ isOpen, onClose }) {
         {NAV_ITEMS.map(item => (
           <a
             key={item.label}
-            href={resolveHref(item.href)}
+            href={item.href}
             onClick={e => handleNavClick(e, item.href)}
             className="gianni-mobile-fullscreen-link"
           >

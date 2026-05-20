@@ -6,17 +6,16 @@ import { useEffect, useState, useCallback } from 'react'
 import { useGianniGlobal } from '..'
 
 const NAV_ITEMS = [
-  { label: 'About', href: '#about' },
-  { label: 'Projects', href: '#projects' },
+  { label: 'About', href: '/#about' },
+  { label: 'Projects', href: '/#projects' },
   { label: 'Blog', href: '/' },
-  { label: 'Contact', href: '#contact' }
+  { label: 'Contact', href: '/#contact' }
 ]
 
 export default function Header() {
   const router = useRouter()
   const isHome = router.pathname === '/' || router.pathname === '/page/[page]'
   const { mobileNavOpen, setMobileNavOpen } = useGianniGlobal() || {}
-  const mainSite = siteConfig('LINK') // e.g. https://gianni.dev
 
   const [activeSection, setActiveSection] = useState(isHome ? '' : null)
   const [mounted, setMounted] = useState(false)
@@ -31,8 +30,8 @@ export default function Header() {
     }
 
     const sectionIds = NAV_ITEMS
-      .filter(item => item.href.startsWith('#'))
-      .map(item => item.href.replace('#', ''))
+      .filter(item => item.href.startsWith('/#'))
+      .map(item => item.href.replace('/#', ''))
 
     const timer = setTimeout(() => {
       const sections = sectionIds
@@ -84,37 +83,27 @@ export default function Header() {
       return
     }
 
-    if (href.startsWith('#')) {
+    if (href.startsWith('/#')) {
       setMobileNavOpen?.(false)
 
       if (isHome) {
+        // Same page: smooth scroll to section
         e.preventDefault()
-        const el = document.getElementById(href.replace('#', ''))
+        const el = document.getElementById(href.replace('/#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
-        setActiveSection(href.replace('#', ''))
+        setActiveSection(href.replace('/#', ''))
       }
-      // On non-home, let the <a> tag's href (mainSite + hash) handle navigation natively
+      // On non-home, let <a href="/#about"> navigate to site root + scroll to section
     }
   }, [isHome, setMobileNavOpen])
-
-  // Resolve the actual URL for a nav item's href attribute
-  const resolveHref = href => {
-    if (href === '/') return href
-    if (href.startsWith('#')) {
-      // On home: use bare hash for smooth scroll
-      // On other pages: link to personal website
-      return isHome ? href : mainSite + href
-    }
-    return href
-  }
 
   const isItemActive = item => {
     if (!mounted) return false
     if (item.href === '/') {
       return !isHome ? false : activeSection === '' && router.pathname === '/'
     }
-    if (item.href.startsWith('#')) {
-      return isHome && activeSection === item.href.replace('#', '')
+    if (item.href.startsWith('/#')) {
+      return isHome && activeSection === item.href.replace('/#', '')
     }
     return router.pathname.startsWith(item.href)
   }
@@ -149,7 +138,7 @@ export default function Header() {
               return (
                 <a
                   key={item.label}
-                  href={resolveHref(item.href)}
+                  href={item.href}
                   onClick={e => handleNavClick(e, item.href)}
                   className={`gianni-nav-link ${active ? 'active' : ''}`}
                 >
@@ -175,7 +164,7 @@ export default function Header() {
             {NAV_ITEMS.map(item => (
               <a
                 key={item.label}
-                href={resolveHref(item.href)}
+                href={item.href}
                 onClick={e => handleNavClick(e, item.href)}
                 className="gianni-mobile-fullscreen-link"
               >

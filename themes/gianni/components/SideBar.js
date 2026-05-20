@@ -11,7 +11,7 @@ export default function SideBar(props) {
       <div className='gianni-sidebar-widget'>
         <div className='flex items-center gap-3 mb-2'>
           <img
-            src={siteConfig('GIANNI_LOGO_IMG')}
+            src={siteConfig('GIANNI_AVATAR_IMG')}
             alt='avatar'
             className='w-10 h-10 rounded-full object-cover'
             style={{ border: '1px solid var(--border)' }}

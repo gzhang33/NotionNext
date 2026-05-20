@@ -1,5 +1,5 @@
 const CONFIG = {
-  GIANNI_LOGO_IMG: '/Logo.webp',
+  GIANNI_AVATAR_IMG: '/avatar.webp',
   GIANNI_NAV_MAIN_SITE: true,
   GIANNI_BLOG_NAV_PILLS: true,
   GIANNI_POST_COVER_ENABLE: false,

@@ -78,26 +78,28 @@ export default function Header() {
   }, [isHome])
 
   const handleNavClick = useCallback((e, href) => {
+    // Prevent default for <a> tags; <span> tags don't need it
+    if (e?.target?.closest?.('a')) e.preventDefault()
+    setMobileNavOpen?.(false)
+
     if (href === '/') {
-      setMobileNavOpen?.(false)
+      router.push('/')
       return
     }
 
     if (href.startsWith('/#')) {
-      e.preventDefault()
-      setMobileNavOpen?.(false)
-
       if (isHome) {
         const el = document.getElementById(href.replace('/#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
         setActiveSection(href.replace('/#', ''))
       } else {
-        // Force full page navigation to leave the NotionNext SPA
-        // Next.js client router would otherwise intercept <a href="/">
-        window.location.href = href
+        // Using <span> instead of <a> avoids Next.js interception,
+        // but setTimeout still helps ensure clean navigation.
+        const target = href
+        setTimeout(() => { window.location.href = target }, 0)
       }
     }
-  }, [isHome, setMobileNavOpen])
+  }, [isHome, setMobileNavOpen, router])
 
   const isItemActive = item => {
     if (!mounted) return false
@@ -137,15 +139,23 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-1">
             {NAV_ITEMS.map(item => {
               const active = isItemActive(item)
+              const isHashLink = item.href.startsWith('/#')
+              // On non-home pages, render <span> instead of <a> to avoid
+              // Next.js client router intercepting the click and blocking
+              // full-page navigation back to the personal site.
+              const Tag = isHashLink && !isHome ? 'span' : 'a'
               return (
-                <a
+                <Tag
                   key={item.label}
-                  href={item.href}
+                  {...(Tag === 'a' ? { href: item.href } : {})}
+                  role="button"
+                  tabIndex={0}
                   onClick={e => handleNavClick(e, item.href)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleNavClick(e, item.href) }}
                   className={`gianni-nav-link ${active ? 'active' : ''}`}
                 >
                   {item.label}
-                </a>
+                </Tag>
               )
             })}
           </div>
@@ -163,16 +173,23 @@ export default function Header() {
       {mobileNavOpen && (
         <div className="gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
           <div className="flex flex-col items-center gap-8">
-            {NAV_ITEMS.map(item => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={e => handleNavClick(e, item.href)}
-                className="gianni-mobile-fullscreen-link"
-              >
-                {item.label}
-              </a>
-            ))}
+            {NAV_ITEMS.map(item => {
+              const isHashLink = item.href.startsWith('/#')
+              const Tag = isHashLink && !isHome ? 'span' : 'a'
+              return (
+                <Tag
+                  key={item.label}
+                  {...(Tag === 'a' ? { href: item.href } : {})}
+                  role="button"
+                  tabIndex={0}
+                  onClick={e => handleNavClick(e, item.href)}
+                  onKeyDown={e => { if (e.key === 'Enter') handleNavClick(e, item.href) }}
+                  className="gianni-mobile-fullscreen-link"
+                >
+                  {item.label}
+                </Tag>
+              )
+            })}
           </div>
         </div>
       )}

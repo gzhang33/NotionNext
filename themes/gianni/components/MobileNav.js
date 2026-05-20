@@ -41,16 +41,18 @@ export default function MobileNav({ isOpen, onClose }) {
   const handleNavClick = (e, href) => {
     onClose?.()
 
-    if (href === '/') return
+    if (href === '/') {
+      router.push('/')
+      return
+    }
 
     if (href.startsWith('/#')) {
-      e.preventDefault()
-
       if (isHome) {
         const el = document.getElementById(href.replace('/#', ''))
         if (el) el.scrollIntoView({ behavior: 'smooth' })
       } else {
-        window.location.href = href
+        const target = href
+        setTimeout(() => { window.location.href = target }, 0)
       }
     }
   }
@@ -60,16 +62,23 @@ export default function MobileNav({ isOpen, onClose }) {
   return (
     <div className="gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
       <div className="flex flex-col items-center gap-8">
-        {NAV_ITEMS.map(item => (
-          <a
-            key={item.label}
-            href={item.href}
-            onClick={e => handleNavClick(e, item.href)}
-            className="gianni-mobile-fullscreen-link"
-          >
-            {item.label}
-          </a>
-        ))}
+        {NAV_ITEMS.map(item => {
+          const isHashLink = item.href.startsWith('/#')
+          const Tag = isHashLink && !isHome ? 'span' : 'a'
+          return (
+            <Tag
+              key={item.label}
+              {...(Tag === 'a' ? { href: item.href } : {})}
+              role="button"
+              tabIndex={0}
+              onClick={e => handleNavClick(e, item.href)}
+              onKeyDown={e => { if (e.key === 'Enter') handleNavClick(e, item.href) }}
+              className="gianni-mobile-fullscreen-link"
+            >
+              {item.label}
+            </Tag>
+          )
+        })}
       </div>
     </div>
   )

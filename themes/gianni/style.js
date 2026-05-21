@@ -79,9 +79,10 @@ const Style = () => {
       }
 
       /* ── Responsive Grid ── */
-      @media (max-width: 900px) {
+      @media (max-width: 1024px) {
         #container-wrapper {
           grid-template-columns: 1fr !important;
+          gap: 0 !important;
         }
         #right-sidebar {
           display: none !important;
@@ -392,6 +393,149 @@ const Style = () => {
       }
 
       /* (old mobile nav styles replaced by fullscreen overlay) */
+
+      /* ── Drawer (mobile TOC & sidebar) ── */
+      #theme-gianni .gianni-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 50;
+        width: 280px;
+        height: 100%;
+        background: #1a1a1a;
+        border-left: 1px solid rgba(255, 255, 255, 0.06);
+        overflow-y: auto;
+        transition: transform var(--transition-base);
+        padding: 20px 16px;
+      }
+      .light #theme-gianni .gianni-drawer {
+        background: #f5f2ed;
+        border-left-color: rgba(0, 0, 0, 0.08);
+      }
+      #theme-gianni .gianni-drawer-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 45;
+        background: rgba(0, 0, 0, 0.6);
+        transition: opacity var(--transition-base);
+      }
+
+      /* ── Right Float Area ── */
+      #theme-gianni .gianni-float-btn {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: var(--text-secondary);
+        transition: all var(--transition-fast);
+        cursor: pointer;
+      }
+      #theme-gianni .gianni-float-btn:hover {
+        color: var(--accent);
+        border-color: var(--border-hover);
+        box-shadow: var(--shadow-sm);
+      }
+      #theme-gianni .gianni-float-btn:active {
+        transform: scale(0.9);
+      }
+
+      /* ── Copyright Card ── */
+      #theme-gianni .gianni-copyright {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+        border-radius: var(--radius-sm);
+        padding: 16px 20px;
+        font-size: 12px;
+        line-height: 1.8;
+        color: var(--text-secondary);
+      }
+      #theme-gianni .gianni-copyright a {
+        color: var(--text-secondary);
+      }
+      #theme-gianni .gianni-copyright a:hover {
+        color: var(--accent);
+      }
+      #theme-gianni .gianni-copyright strong {
+        color: var(--text);
+        margin-right: 6px;
+      }
+
+      /* ── Loading ── */
+      @keyframes gianni-spin {
+        to { transform: rotate(360deg); }
+      }
+      #theme-gianni .gianni-loading-spinner {
+        width: 28px;
+        height: 28px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: gianni-spin 0.8s linear infinite;
+      }
+
+      /* ── Mobile Nav Blog Pills ── */
+      #theme-gianni .gianni-mobile-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+      }
+
+      /* ── Focus Visible ── */
+      #theme-gianni *:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* ── Phase 3: Visual Polish ── */
+
+      /* Card hover lift */
+      #theme-gianni .gianni-card:hover {
+        transform: translateY(-2px);
+      }
+
+      /* Blog item hover lift */
+      #theme-gianni .gianni-timeline-item:hover .gianni-timeline-title {
+        color: var(--accent);
+      }
+
+      /* Sidebar widget hover */
+      #theme-gianni .gianni-sidebar-widget:hover {
+        border-color: var(--border-hover);
+      }
+
+      /* Responsive padding */
+      @media (max-width: 640px) {
+        #container-wrapper {
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+        #theme-gianni .gianni-mobile-fullscreen-link {
+          font-size: 22px;
+        }
+      }
+
+      /* Article title responsive */
+      @media (max-width: 640px) {
+        #theme-gianni h1.blog-item-title {
+          font-size: 1.5rem !important;
+        }
+      }
+
+      /* Footer responsive */
+      @media (max-width: 640px) {
+        #theme-gianni footer {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+      }
     `}</style>
   )
 }

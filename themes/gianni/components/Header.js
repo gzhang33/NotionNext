@@ -2,6 +2,7 @@ import SmartLink from '@/components/SmartLink'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import { useEffect, useState, useCallback } from 'react'
 import { useGianniGlobal } from '..'
+import { siteConfig } from '@/lib/config'
 import {
   MAIN_NAV_ITEMS,
   PERSONAL_SITE_URL,
@@ -59,14 +60,25 @@ export default function Header() {
           aria-label='Main navigation'
           className='gianni-nav-pill h-[3.25rem] w-full max-w-[680px] px-3 sm:px-2.5 flex items-center justify-between'
         >
-          <SmartLink
-            href={blogHomeHref}
-            onClick={handleHomeClick}
-            className='shrink-0 pl-1 sm:pl-3.5 py-1.5 gianni-nav-logo'
-            aria-label='Scroll to top'
-          >
-            Gianni<span className='gianni-nav-dot'>.</span>
-          </SmartLink>
+          {blogHomeHref === '/blog' ? (
+            <a
+              href={blogHomeHref}
+              onClick={handleHomeClick}
+              className='shrink-0 pl-1 sm:pl-3.5 py-1.5 gianni-nav-logo'
+              aria-label='Scroll to top'
+            >
+              {siteConfig('AUTHOR')}<span className='gianni-nav-dot'>.</span>
+            </a>
+          ) : (
+            <SmartLink
+              href={blogHomeHref}
+              onClick={handleHomeClick}
+              className='shrink-0 pl-1 sm:pl-3.5 py-1.5 gianni-nav-logo'
+              aria-label='Scroll to top'
+            >
+              {siteConfig('AUTHOR')}<span className='gianni-nav-dot'>.</span>
+            </SmartLink>
+          )}
 
           <div className='hidden md:flex items-center gap-1'>
             {MAIN_NAV_ITEMS.map(item => {

@@ -1,4 +1,5 @@
 import { siteConfig } from '@/lib/config'
+import { useGlobal } from '@/lib/global'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useGianniGlobal } from '..'
@@ -7,6 +8,7 @@ import SmartLink from '@/components/SmartLink'
 import { PERSONAL_SITE_URL, getBlogHomeHref } from '../navigation'
 
 export default function NavBar(props) {
+  const { locale } = useGlobal()
   const [showSearchInput, setShowSearchInput] = useState(false)
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
@@ -33,27 +35,39 @@ export default function NavBar(props) {
   }
 
   const pills = [
-    { label: 'Latest', href: blogHomeHref, show: true },
-    { label: 'Archive', href: '/archive', show: siteConfig('GIANNI_MENU_ARCHIVE', null, CONFIG) },
-    { label: 'Tags', href: '/tag', show: siteConfig('GIANNI_MENU_TAG', null, CONFIG) },
-    { label: 'Categories', href: '/category', show: siteConfig('GIANNI_MENU_CATEGORY', null, CONFIG) }
+    { label: locale.COMMON.LATEST_POSTS, href: blogHomeHref, show: true },
+    { label: locale.NAV.ARCHIVE, href: '/archive', show: siteConfig('GIANNI_MENU_ARCHIVE', null, CONFIG) },
+    { label: locale.COMMON.TAGS, href: '/tag', show: siteConfig('GIANNI_MENU_TAG', null, CONFIG) },
+    { label: locale.COMMON.CATEGORY, href: '/category', show: siteConfig('GIANNI_MENU_CATEGORY', null, CONFIG) }
   ].filter(p => p.show)
 
   const isActive = href => {
     const path = router.pathname
-    if (href === '/' || href === '/blog') return path === '/' || path === '/page/[page]'
+    if (href === '/' || href === '/blog') {
+      return path === '/' || path === '/blog'
+        || path === '/page/[page]' || path === '/blog/page/[page]'
+    }
     return path.startsWith(href)
   }
 
   return (
     <div className='hidden md:flex max-w-[1100px] mx-auto mt-4 px-8 gap-2 flex-wrap items-center'>
       {pills.map(pill => (
-        <SmartLink
-          key={pill.href}
-          href={pill.href}
-          className={`gianni-pill${isActive(pill.href) ? ' active' : ''}`}>
-          {pill.label}
-        </SmartLink>
+        pill.href === '/blog' ? (
+          <a
+            key={pill.href}
+            href={pill.href}
+            className={`gianni-pill${isActive(pill.href) ? ' active' : ''}`}>
+            {pill.label}
+          </a>
+        ) : (
+          <SmartLink
+            key={pill.href}
+            href={pill.href}
+            className={`gianni-pill${isActive(pill.href) ? ' active' : ''}`}>
+            {pill.label}
+          </SmartLink>
+        )
       ))}
 
       {showSearchInput && (
@@ -66,7 +80,7 @@ export default function NavBar(props) {
           type='search'
           name='s'
           autoComplete='off'
-          placeholder='Type then hit enter to search...'
+          placeholder={locale.SEARCH.ARTICLES}
         />
       )}
 

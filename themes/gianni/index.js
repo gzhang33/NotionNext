@@ -28,7 +28,6 @@ const ShareBar = dynamic(() => import('@/components/ShareBar'), { ssr: false })
 const Header = dynamic(() => import('./components/Header'), { ssr: false })
 const NavBar = dynamic(() => import('./components/NavBar'), { ssr: false })
 const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
-const JumpToTopButton = dynamic(() => import('./components/JumpToTopButton'), { ssr: false })
 const Footer = dynamic(() => import('./components/Footer'), { ssr: false })
 const SearchInput = dynamic(() => import('./components/SearchInput'), { ssr: false })
 const WWads = dynamic(() => import('@/components/WWAds'), { ssr: false })
@@ -38,6 +37,12 @@ const Catalog = dynamic(() => import('./components/Catalog'), { ssr: false })
 const ReadingProgress = dynamic(() => import('./components/ReadingProgress'), { ssr: false })
 const MobileNav = dynamic(() => import('./components/MobileNav'), { ssr: false })
 const ThemeToggle = dynamic(() => import('./components/ThemeToggle'), { ssr: false })
+const RightFloatArea = dynamic(() => import('./components/RightFloatArea'), { ssr: false })
+const TocDrawer = dynamic(() => import('./components/TocDrawer'), { ssr: false })
+const SideBarDrawer = dynamic(() => import('./components/SideBarDrawer'), { ssr: false })
+const LoadingCover = dynamic(() => import('./components/LoadingCover'), { ssr: false })
+const BlogListEmpty = dynamic(() => import('./components/BlogListEmpty'), { ssr: false })
+const ArticleCopyright = dynamic(() => import('./components/ArticleCopyright'), { ssr: false })
 
 const ThemeGlobalGianni = createContext()
 export const useGianniGlobal = () => useContext(ThemeGlobalGianni)
@@ -47,6 +52,8 @@ const LayoutBase = props => {
   const { onLoading, fullWidth } = useGlobal()
   const searchModal = useRef(null)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const tocDrawerRef = useRef(null)
+  const [sidebarDrawerOpen, setSidebarDrawerOpen] = useState(false)
 
   return (
     <ThemeGlobalGianni.Provider value={{ searchModal, mobileNavOpen, setMobileNavOpen }}>
@@ -59,6 +66,8 @@ const LayoutBase = props => {
         <ThemeToggle />
         <NavBar {...props} />
         <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+
+        {onLoading && <LoadingCover />}
 
         <div
           id='container-wrapper'
@@ -93,9 +102,30 @@ const LayoutBase = props => {
           )}
         </div>
 
-        <div className='fixed right-4 bottom-4 z-20'>
-          <JumpToTopButton />
-        </div>
+        {/* Mobile: TOC drawer */}
+        {siteConfig('GIANNI_MOBILE_TOC_DRAWER', null, CONFIG) && (
+          <div className='block lg:hidden'>
+            <TocDrawer post={props.post} cRef={tocDrawerRef} />
+          </div>
+        )}
+
+        {/* Mobile: Sidebar drawer */}
+        {siteConfig('GIANNI_MOBILE_SIDEBAR_DRAWER', null, CONFIG) && (
+          <div className='block lg:hidden'>
+            <SideBarDrawer
+              isOpen={sidebarDrawerOpen}
+              onClose={() => setSidebarDrawerOpen(false)}
+              {...props}
+            />
+          </div>
+        )}
+
+        {/* Floating action buttons */}
+        <RightFloatArea
+          post={props.post}
+          onToggleToc={() => tocDrawerRef.current?.handleSwitchVisible()}
+          onToggleSidebar={() => setSidebarDrawerOpen(prev => !prev)}
+        />
 
         <AlgoliaSearchModal cRef={searchModal} {...props} />
         <Footer {...props} />
@@ -109,10 +139,14 @@ const LayoutIndex = props => <LayoutPostList {...props} />
 const LayoutPostList = props => (
   <>
     <BlogPostBar {...props} />
-    {siteConfig('POST_LIST_STYLE') === 'page' ? (
-      <BlogListPage {...props} />
+    {(props.posts?.length === 0) ? (
+      <BlogListEmpty currentSearch={props.currentSearch} />
     ) : (
-      <BlogListScroll {...props} />
+      siteConfig('POST_LIST_STYLE') === 'page' ? (
+        <BlogListPage {...props} />
+      ) : (
+        <BlogListScroll {...props} />
+      )
     )}
   </>
 )
@@ -154,6 +188,20 @@ const LayoutArchive = props => {
 const LayoutSlug = props => {
   const { post, lock, validPassword, prev, next, recommendPosts } = props
   const { fullWidth } = useGlobal()
+  const router = useRouter()
+  const waiting404 = siteConfig('POST_WAITING_TIME_FOR_404') * 1000
+
+  useEffect(() => {
+    if (!post) {
+      const timer = setTimeout(() => {
+        if (isBrowser) {
+          const article = document.querySelector('#article-wrapper #notion-article')
+          if (!article) router.push('/404')
+        }
+      }, waiting404)
+      return () => clearTimeout(timer)
+    }
+  }, [post])
 
   return (
     <>
@@ -170,6 +218,7 @@ const LayoutSlug = props => {
           {post?.type === 'Post' && (
             <>
               <ArticleAround prev={prev} next={next} />
+              <ArticleCopyright post={post} />
               <RecommendPosts recommendPosts={recommendPosts} />
             </>
           )}
@@ -177,7 +226,7 @@ const LayoutSlug = props => {
         </div>
       )}
       {!lock && post && !fullWidth && (
-        <div className='hidden max-[900px]:hidden sticky top-8 self-start'>
+        <div className='hidden lg:block sticky top-8 self-start'>
           <Catalog {...props} />
         </div>
       )}
@@ -186,29 +235,18 @@ const LayoutSlug = props => {
 }
 
 const Layout404 = props => {
-  const { post } = props
-  const router = useRouter()
-  const waiting404 = siteConfig('POST_WAITING_TIME_FOR_404') * 1000
-  useEffect(() => {
-    if (!post) {
-      setTimeout(() => {
-        if (isBrowser) {
-          const article = document.querySelector('#article-wrapper #notion-article')
-          if (!article) router.push('/404')
-        }
-      }, waiting404)
-    }
-  }, [post])
-  return <>404 Not found.</>
+  const { locale } = useGlobal()
+  return <>{locale.COMMON.NOT_FOUND}</>
 }
 
 const LayoutCategoryIndex = props => {
   const { categoryOptions } = props
+  const { locale } = useGlobal()
   return (
     <div className='mb-6 pb-4' style={{ borderBottom: '1px solid var(--divider)' }}>
       <div className='gianni-section-title'>
         <i className='fas fa-folder mr-1' />
-        Categories
+        {locale.COMMON.CATEGORY}
       </div>
       <div className='flex flex-wrap gap-2 mt-2'>
         {categoryOptions?.map(category => (
@@ -225,11 +263,12 @@ const LayoutCategoryIndex = props => {
 
 const LayoutTagIndex = props => {
   const { tagOptions } = props
+  const { locale } = useGlobal()
   return (
     <div className='mb-6 pb-4' style={{ borderBottom: '1px solid var(--divider)' }}>
       <div className='gianni-section-title'>
         <i className='fas fa-tag mr-1' />
-        Tags
+        {locale.COMMON.TAGS}
       </div>
       <div className='flex flex-wrap gap-2 mt-2'>
         {tagOptions.map(tag => (

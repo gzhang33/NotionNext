@@ -1,9 +1,11 @@
 import { siteConfig } from '@/lib/config'
+import { useGlobal } from '@/lib/global'
 import SmartLink from '@/components/SmartLink'
 import Announcement from './Announcement'
 import Catalog from './Catalog'
 
 export default function SideBar(props) {
+  const { locale } = useGlobal()
   const { notice, categories, tags } = props
 
   return (
@@ -33,7 +35,7 @@ export default function SideBar(props) {
         <div className='gianni-sidebar-widget'>
           <div className='gianni-section-title'>
             <i className='fas fa-folder mr-1' />
-            Categories
+            {locale.COMMON.CATEGORY}
           </div>
           <div className='flex flex-wrap gap-1'>
             {categories.map(c => (
@@ -53,7 +55,7 @@ export default function SideBar(props) {
         <div className='gianni-sidebar-widget'>
           <div className='gianni-section-title'>
             <i className='fas fa-tag mr-1' />
-            Tags
+            {locale.COMMON.TAGS}
           </div>
           <div className='flex flex-wrap gap-1'>
             {tags.map(t => (

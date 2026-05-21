@@ -16,6 +16,15 @@ const CONFIG = {
   GIANNI_MENU_CATEGORY: true,
   GIANNI_MENU_TAG: true,
   GIANNI_MENU_ARCHIVE: true,
-  GIANNI_MENU_SEARCH: true
+  GIANNI_MENU_SEARCH: true,
+
+  // Phase 1: Mobile responsive
+  GIANNI_MOBILE_BLOG_PILLS: true,
+  GIANNI_MOBILE_TOC_DRAWER: true,
+  GIANNI_MOBILE_SIDEBAR_DRAWER: true,
+
+  // Phase 2: Missing components
+  GIANNI_ARTICLE_COPYRIGHT: true,
+  GIANNI_ARTICLE_JUMP_TO_COMMENT: true
 }
 export default CONFIG

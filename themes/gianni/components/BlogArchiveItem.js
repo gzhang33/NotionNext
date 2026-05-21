@@ -2,6 +2,7 @@ import SmartLink from '@/components/SmartLink'
 
 export default function BlogArchiveItem({ archiveTitle, archivePosts, index = 0, animate = false }) {
   const animStyle = animate ? { animationDelay: `${index * 80}ms` } : {}
+  const getPostHref = post => post?.href || (post?.slug ? `/${post.slug}` : '#')
 
   return (
     <div className={animate ? 'gianni-animate-in' : ''} style={animStyle}>
@@ -35,7 +36,7 @@ export default function BlogArchiveItem({ archiveTitle, archivePosts, index = 0,
                   {post.date.start_date}
                 </div>
               )}
-              <SmartLink href={post?.href}>
+              <SmartLink href={getPostHref(post)}>
                 <div className='text-sm font-medium leading-tight' style={{ color: 'var(--text-secondary)', transition: 'color var(--transition-fast)' }}>
                   {post.title}
                 </div>

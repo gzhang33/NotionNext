@@ -1,6 +1,8 @@
 import SmartLink from '@/components/SmartLink'
+import { useGlobal } from '@/lib/global'
 
 export default function ArticleAround({ prev, next }) {
+  const { locale } = useGlobal()
   if (!prev && !next) return <></>
 
   return (
@@ -8,7 +10,7 @@ export default function ArticleAround({ prev, next }) {
       {prev ? (
         <SmartLink href={`/${prev.slug}`} className='gianni-card p-3 group'>
           <div className='text-[9px] uppercase tracking-wider mb-1' style={{ color: 'var(--text-muted)' }}>
-            <i className='fas fa-arrow-left mr-1' /> Previous
+            <i className='fas fa-arrow-left mr-1' /> {locale.PAGINATION.PREV}
           </div>
           <div
             className='text-[11px] font-medium leading-snug truncate group-hover:translate-x-[-2px]'
@@ -20,7 +22,7 @@ export default function ArticleAround({ prev, next }) {
       {next ? (
         <SmartLink href={`/${next.slug}`} className='gianni-card p-3 text-right group'>
           <div className='text-[9px] uppercase tracking-wider mb-1' style={{ color: 'var(--text-muted)' }}>
-            Next <i className='fas fa-arrow-right ml-1' />
+            {locale.PAGINATION.NEXT} <i className='fas fa-arrow-right ml-1' />
           </div>
           <div
             className='text-[11px] font-medium leading-snug truncate group-hover:translate-x-[2px]'

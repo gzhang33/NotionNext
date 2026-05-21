@@ -16,6 +16,7 @@ export const BlogItem = props => {
   const dateStr = post.publishDay || post.date?.start_date
   const formattedDate = formatShortDate(dateStr)
   const showCover = siteConfig('GIANNI_POST_COVER_ENABLE', null, CONFIG) && post.pageCoverThumbnail
+  const postHref = post?.href || (post?.slug ? `/${post.slug}` : '#')
   const animStyle = animate ? { animationDelay: `${index * 60}ms` } : {}
 
   return (
@@ -30,7 +31,7 @@ export const BlogItem = props => {
 
       <div className="flex-1 min-w-0">
         {showCover && (
-          <SmartLink href={post.href}>
+          <SmartLink href={postHref}>
             <div className="mb-2 overflow-hidden" style={{ borderRadius: 'var(--cover-radius)' }}>
               <LazyImage
                 src={post.pageCoverThumbnail}
@@ -48,7 +49,7 @@ export const BlogItem = props => {
           </div>
         )}
 
-        <SmartLink href={post.href}>
+        <SmartLink href={postHref}>
           <div className="gianni-timeline-title text-sm font-semibold leading-tight" style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}>
             {post.title}
           </div>

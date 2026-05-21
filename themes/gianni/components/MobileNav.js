@@ -7,9 +7,14 @@ import {
   getPersonalSectionHref,
   isBlogHomePath
 } from '../navigation'
+import { siteConfig } from '@/lib/config'
+import { useGlobal } from '@/lib/global'
+import SmartLink from '@/components/SmartLink'
+import CONFIG from '../config'
 
 export default function MobileNav({ isOpen, onClose }) {
   const router = useRouter()
+  const { locale } = useGlobal()
   const [mounted, setMounted] = useState(false)
   const siteUrl = PERSONAL_SITE_URL
   const currentPath =
@@ -82,6 +87,66 @@ export default function MobileNav({ isOpen, onClose }) {
             {item.label}
           </a>
         ))}
+
+        {siteConfig('GIANNI_MOBILE_BLOG_PILLS', null, CONFIG) && (
+          <>
+            <div style={{ width: 40, height: 1, background: 'var(--divider)' }} />
+
+            <div className='gianni-mobile-pills'>
+              {blogHomeHref === '/blog' ? (
+                <a
+                  href={blogHomeHref}
+                  className={`gianni-pill${(router.pathname === '/' || router.pathname === '/blog' || router.pathname === '/page/[page]' || router.pathname === '/blog/page/[page]') ? ' active' : ''}`}
+                >
+                  {locale.COMMON.LATEST_POSTS}
+                </a>
+              ) : (
+                <SmartLink
+                  href={blogHomeHref}
+                  className={`gianni-pill${(router.pathname === '/' || router.pathname === '/blog' || router.pathname === '/page/[page]' || router.pathname === '/blog/page/[page]') ? ' active' : ''}`}
+                >
+                  {locale.COMMON.LATEST_POSTS}
+                </SmartLink>
+              )}
+
+              {siteConfig('GIANNI_MENU_ARCHIVE', null, CONFIG) && (
+                <SmartLink
+                  href='/archive'
+                  className={`gianni-pill${router.pathname === '/archive' ? ' active' : ''}`}
+                >
+                  {locale.NAV.ARCHIVE}
+                </SmartLink>
+              )}
+
+              {siteConfig('GIANNI_MENU_TAG', null, CONFIG) && (
+                <SmartLink
+                  href='/tag'
+                  className={`gianni-pill${router.pathname.startsWith('/tag') ? ' active' : ''}`}
+                >
+                  {locale.COMMON.TAGS}
+                </SmartLink>
+              )}
+
+              {siteConfig('GIANNI_MENU_CATEGORY', null, CONFIG) && (
+                <SmartLink
+                  href='/category'
+                  className={`gianni-pill${router.pathname.startsWith('/category') ? ' active' : ''}`}
+                >
+                  {locale.COMMON.CATEGORY}
+                </SmartLink>
+              )}
+
+              {siteConfig('GIANNI_MENU_SEARCH', null, CONFIG) && (
+                <SmartLink
+                  href='/search'
+                  className={`gianni-pill${router.pathname.startsWith('/search') ? ' active' : ''}`}
+                >
+                  <i className='fa-solid fa-magnifying-glass' />
+                </SmartLink>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

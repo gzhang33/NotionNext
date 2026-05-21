@@ -14,7 +14,7 @@ export const MAIN_NAV_ITEMS = [
 ]
 
 export const PERSONAL_SITE_URL = (
-  process.env.NEXT_PUBLIC_LINK || 'https://giannizhang.dev'
+  process.env.NEXT_PUBLIC_LINK || ''
 ).trim()
 
 export function getPersonalSectionHref(siteUrl, sectionId) {

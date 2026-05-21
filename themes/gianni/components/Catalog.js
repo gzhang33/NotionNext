@@ -1,7 +1,9 @@
 import { uuidToId } from 'notion-utils'
 import { useEffect, useRef, useState } from 'react'
+import { useGlobal } from '@/lib/global'
 
 const Catalog = ({ post }) => {
+  const { locale } = useGlobal()
   const tRef = useRef(null)
   const [activeSection, setActiveSection] = useState(null)
 
@@ -55,7 +57,7 @@ const Catalog = ({ post }) => {
   return (
     <div className='gianni-sidebar-widget'>
       <div className='text-[10px] uppercase tracking-wider mb-2 font-medium' style={{ color: 'var(--text-muted)' }}>
-        Contents
+        {locale.COMMON.TABLE_OF_CONTENTS}
       </div>
       <div
         className='overflow-y-auto overscroll-none max-h-64'

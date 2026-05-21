@@ -55,11 +55,13 @@ export async function getStaticProps({ params: { tag }, locale }) {
  * @param tags
  */
 function getTagNames(tags) {
-  const tagNames = []
-  tags.forEach(tag => {
-    tagNames.push(tag.name)
-  })
-  return tagNames
+  if (Array.isArray(tags)) {
+    return tags.filter(tag => tag?.name).map(tag => tag.name)
+  }
+
+  return Object.values(tags || {})
+    .filter(tag => tag?.name)
+    .map(tag => tag.name)
 }
 
 export async function getStaticPaths() {

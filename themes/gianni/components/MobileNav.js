@@ -1,20 +1,25 @@
-import { siteConfig } from '@/lib/config'
-import SmartLink from '@/components/SmartLink'
-import CONFIG from '../config'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { useGianniGlobal } from '..'
-
-const NAV_ITEMS = [
-  { label: 'About', href: '/#about' },
-  { label: 'Projects', href: '/#projects' },
-  { label: 'Blog', href: '/' },
-  { label: 'Contact', href: '/#contact' }
-]
+import { useEffect, useState } from 'react'
+import {
+  MAIN_NAV_ITEMS,
+  PERSONAL_SITE_URL,
+  getBlogHomeHref,
+  getPersonalSectionHref,
+  isBlogHomePath
+} from '../navigation'
 
 export default function MobileNav({ isOpen, onClose }) {
   const router = useRouter()
-  const realIsHome = router.asPath === '/' || router.asPath.startsWith('/?') || router.asPath.startsWith('/page/')
+  const [mounted, setMounted] = useState(false)
+  const siteUrl = PERSONAL_SITE_URL
+  const currentPath =
+    mounted && typeof window !== 'undefined'
+      ? `${window.location.pathname}${window.location.search}`
+      : ''
+  const currentOrigin =
+    mounted && typeof window !== 'undefined' ? window.location.origin : ''
+  const realIsHome = isBlogHomePath(currentPath)
+  const blogHomeHref = getBlogHomeHref(siteUrl, currentOrigin)
 
   useEffect(() => {
     const handleRouteChange = () => onClose?.()
@@ -28,12 +33,20 @@ export default function MobileNav({ isOpen, onClose }) {
     } else {
       document.body.style.overflow = ''
     }
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [isOpen])
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
     if (!isOpen) return
-    const onEscape = e => { if (e.key === 'Escape') onClose?.() }
+    const onEscape = e => {
+      if (e.key === 'Escape') onClose?.()
+    }
     document.addEventListener('keydown', onEscape)
     return () => document.removeEventListener('keydown', onEscape)
   }, [isOpen, onClose])
@@ -41,42 +54,33 @@ export default function MobileNav({ isOpen, onClose }) {
   const handleNavClick = (e, href) => {
     onClose?.()
 
-    if (href === '/') {
-      if (realIsHome) {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      } else {
-        router.push('/')
-      }
-      return
+    if (href === blogHomeHref && realIsHome) {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
 
-    if (href.startsWith('/#')) {
-      if (realIsHome) {
-        const el = document.getElementById(href.replace('/#', ''))
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
-      } else {
-        const target = href
-        setTimeout(() => { window.location.href = target }, 0)
-      }
+  const getItemHref = item => {
+    if (item.kind === 'blog') {
+      return blogHomeHref
     }
+    return getPersonalSectionHref(siteUrl, item.sectionId)
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center">
-      <div className="flex flex-col items-center gap-8">
-        {NAV_ITEMS.map(item => (
-          <span
+    <div className='gianni-mobile-fullscreen-backdrop z-[60] md:hidden flex items-center justify-center'>
+      <div className='flex flex-col items-center gap-8'>
+        {MAIN_NAV_ITEMS.map(item => (
+          <a
             key={item.label}
-            role="button"
-            tabIndex={0}
-            onClick={e => handleNavClick(e, item.href)}
-            onKeyDown={e => { if (e.key === 'Enter') handleNavClick(e, item.href) }}
-            className="gianni-mobile-fullscreen-link"
+            href={getItemHref(item)}
+            onClick={e => handleNavClick(e, getItemHref(item))}
+            className='gianni-mobile-fullscreen-link'
           >
             {item.label}
-          </span>
+          </a>
         ))}
       </div>
     </div>

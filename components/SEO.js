@@ -71,8 +71,6 @@ const SEO = props => {
     NOTION_CONFIG
   )
 
-  const BLOG_FAVICON = siteConfig('BLOG_FAVICON', null, NOTION_CONFIG)
-
   const COMMENT_WEBMENTION_ENABLE = siteConfig(
     'COMMENT_WEBMENTION_ENABLE',
     null,
@@ -101,6 +99,8 @@ const SEO = props => {
   return (
     <Head>
       <link rel='icon' href={favicon} />
+      <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+      <link rel='apple-touch-icon' href='/favicon.ico' />
       <title>{title}</title>
       <meta name='theme-color' content={BACKGROUND_DARK} />
       <meta
@@ -159,8 +159,6 @@ const SEO = props => {
       <meta name='twitter:description' content={description} />
       <meta name='twitter:image' content={image} />
       <meta name='twitter:image:alt' content={title} />
-
-      <link rel='icon' href={BLOG_FAVICON} />
 
       {COMMENT_WEBMENTION_ENABLE && (
         <>

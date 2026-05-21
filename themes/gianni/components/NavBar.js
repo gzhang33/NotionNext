@@ -1,14 +1,21 @@
 import { siteConfig } from '@/lib/config'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGianniGlobal } from '..'
 import CONFIG from '../config'
 import SmartLink from '@/components/SmartLink'
+import { PERSONAL_SITE_URL, getBlogHomeHref } from '../navigation'
 
 export default function NavBar(props) {
   const [showSearchInput, setShowSearchInput] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
   const { searchModal } = useGianniGlobal()
+  const currentOrigin =
+    mounted && typeof window !== 'undefined' ? window.location.origin : ''
+  const blogHomeHref = getBlogHomeHref(PERSONAL_SITE_URL, currentOrigin)
+
+  useEffect(() => { setMounted(true) }, [])
 
   const toggleSearch = () => {
     if (siteConfig('ALGOLIA_APP_ID')) {
@@ -26,7 +33,7 @@ export default function NavBar(props) {
   }
 
   const pills = [
-    { label: 'Latest', href: '/', show: true },
+    { label: 'Latest', href: blogHomeHref, show: true },
     { label: 'Archive', href: '/archive', show: siteConfig('GIANNI_MENU_ARCHIVE', null, CONFIG) },
     { label: 'Tags', href: '/tag', show: siteConfig('GIANNI_MENU_TAG', null, CONFIG) },
     { label: 'Categories', href: '/category', show: siteConfig('GIANNI_MENU_CATEGORY', null, CONFIG) }
@@ -34,7 +41,7 @@ export default function NavBar(props) {
 
   const isActive = href => {
     const path = router.pathname
-    if (href === '/') return path === '/' || path === '/page/[page]'
+    if (href === '/' || href === '/blog') return path === '/' || path === '/page/[page]'
     return path.startsWith(href)
   }
 

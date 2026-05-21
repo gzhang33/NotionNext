@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { isBrowser } from '@/lib/utils'
 
-export default function ReadingProgress({ targetRef }) {
+export default function ReadingProgress() {
   const [percent, setPercent] = useState(0)
 
   useEffect(() => {

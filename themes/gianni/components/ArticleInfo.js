@@ -2,18 +2,20 @@ import SmartLink from '@/components/SmartLink'
 import { siteConfig } from '@/lib/config'
 import NotionIcon from '@/components/NotionIcon'
 import LazyImage from '@/components/LazyImage'
+import { useGlobal } from '@/lib/global'
 import CONFIG from '../config'
 
-function estimateReadingTime(wordCount) {
+function estimateReadingTime(wordCount, locale) {
   if (!wordCount || wordCount <= 0) return null
   const minutes = Math.max(1, Math.ceil(wordCount / 200))
-  return `${minutes} min read`
+  return `${minutes} ${locale.COMMON.MINUTE}`
 }
 
 export default function ArticleInfo(props) {
   const { post } = props
+  const { locale } = useGlobal()
   const showCover = siteConfig('GIANNI_POST_COVER_ENABLE', null, CONFIG) && post?.pageCoverThumbnail
-  const readingTime = estimateReadingTime(post?.wordCount)
+  const readingTime = estimateReadingTime(post?.wordCount, locale)
 
   return (
     <section className='mb-6'>
@@ -49,7 +51,7 @@ export default function ArticleInfo(props) {
           }}>
           <span>
             <i className='fa-regular fa-user mr-1' />
-            <a href={siteConfig('SIMPLE_AUTHOR_LINK', null, CONFIG)} style={{ color: 'var(--text-secondary)' }}>
+            <a href={process.env.NEXT_PUBLIC_AUTHOR_LINK || '#'} style={{ color: 'var(--text-secondary)' }}>
               {siteConfig('AUTHOR')}
             </a>
           </span>

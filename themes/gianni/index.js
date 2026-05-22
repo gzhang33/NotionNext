@@ -18,31 +18,31 @@ const AlgoliaSearchModal = dynamic(
   { ssr: false }
 )
 
-const BlogListScroll = dynamic(() => import('./components/BlogListScroll'), { ssr: false })
-const BlogArchiveItem = dynamic(() => import('./components/BlogArchiveItem'), { ssr: false })
+const BlogListScroll = dynamic(() => import('./components/BlogListScroll'))
+const BlogArchiveItem = dynamic(() => import('./components/BlogArchiveItem'))
 const ArticleLock = dynamic(() => import('./components/ArticleLock'), { ssr: false })
-const ArticleInfo = dynamic(() => import('./components/ArticleInfo'), { ssr: false })
+const ArticleInfo = dynamic(() => import('./components/ArticleInfo'))
 const Comment = dynamic(() => import('@/components/Comment'), { ssr: false })
-const ArticleAround = dynamic(() => import('./components/ArticleAround'), { ssr: false })
-const ShareBar = dynamic(() => import('@/components/ShareBar'), { ssr: false })
-const Header = dynamic(() => import('./components/Header'), { ssr: false })
-const NavBar = dynamic(() => import('./components/NavBar'), { ssr: false })
-const SideBar = dynamic(() => import('./components/SideBar'), { ssr: false })
-const Footer = dynamic(() => import('./components/Footer'), { ssr: false })
-const SearchInput = dynamic(() => import('./components/SearchInput'), { ssr: false })
-const WWads = dynamic(() => import('@/components/WWAds'), { ssr: false })
-const BlogListPage = dynamic(() => import('./components/BlogListPage'), { ssr: false })
-const RecommendPosts = dynamic(() => import('./components/RecommendPosts'), { ssr: false })
-const Catalog = dynamic(() => import('./components/Catalog'), { ssr: false })
-const ReadingProgress = dynamic(() => import('./components/ReadingProgress'), { ssr: false })
-const MobileNav = dynamic(() => import('./components/MobileNav'), { ssr: false })
-const ThemeToggle = dynamic(() => import('./components/ThemeToggle'), { ssr: false })
-const RightFloatArea = dynamic(() => import('./components/RightFloatArea'), { ssr: false })
-const TocDrawer = dynamic(() => import('./components/TocDrawer'), { ssr: false })
-const SideBarDrawer = dynamic(() => import('./components/SideBarDrawer'), { ssr: false })
-const LoadingCover = dynamic(() => import('./components/LoadingCover'), { ssr: false })
-const BlogListEmpty = dynamic(() => import('./components/BlogListEmpty'), { ssr: false })
-const ArticleCopyright = dynamic(() => import('./components/ArticleCopyright'), { ssr: false })
+const ArticleAround = dynamic(() => import('./components/ArticleAround'))
+const ShareBar = dynamic(() => import('@/components/ShareBar'))
+const Header = dynamic(() => import('./components/Header'))
+const NavBar = dynamic(() => import('./components/NavBar'))
+const SideBar = dynamic(() => import('./components/SideBar'))
+const Footer = dynamic(() => import('./components/Footer'))
+const SearchInput = dynamic(() => import('./components/SearchInput'))
+const WWads = dynamic(() => import('@/components/WWads'), { ssr: false })
+const BlogListPage = dynamic(() => import('./components/BlogListPage'))
+const RecommendPosts = dynamic(() => import('./components/RecommendPosts'))
+const Catalog = dynamic(() => import('./components/Catalog'))
+const ReadingProgress = dynamic(() => import('./components/ReadingProgress'))
+const MobileNav = dynamic(() => import('./components/MobileNav'))
+const ThemeToggle = dynamic(() => import('./components/ThemeToggle'))
+const RightFloatArea = dynamic(() => import('./components/RightFloatArea'))
+const TocDrawer = dynamic(() => import('./components/TocDrawer'))
+const SideBarDrawer = dynamic(() => import('./components/SideBarDrawer'))
+const LoadingCover = dynamic(() => import('./components/LoadingCover'))
+const BlogListEmpty = dynamic(() => import('./components/BlogListEmpty'))
+const ArticleCopyright = dynamic(() => import('./components/ArticleCopyright'))
 
 const ThemeGlobalGianni = createContext()
 export const useGianniGlobal = () => useContext(ThemeGlobalGianni)
@@ -161,7 +161,7 @@ const LayoutSearch = props => {
         target: { element: 'span', className: 'text-red-500 border-b border-dashed' }
       })
     }
-  }, [])
+  }, [keyword])
   const slotTop = siteConfig('ALGOLIA_APP_ID') ? null : <SearchInput {...props} />
   return <LayoutPostList {...props} slotTop={slotTop} />
 }
@@ -201,7 +201,7 @@ const LayoutSlug = props => {
       }, waiting404)
       return () => clearTimeout(timer)
     }
-  }, [post])
+  }, [post, router, waiting404])
 
   return (
     <>

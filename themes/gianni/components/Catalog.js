@@ -6,6 +6,11 @@ const Catalog = ({ post }) => {
   const { locale } = useGlobal()
   const tRef = useRef(null)
   const [activeSection, setActiveSection] = useState(null)
+  const activeSectionRef = useRef(null)
+
+  useEffect(() => {
+    activeSectionRef.current = activeSection
+  }, [activeSection])
 
   useEffect(() => {
     let throttleTimer = null
@@ -14,7 +19,7 @@ const Catalog = ({ post }) => {
     const actionSectionScrollSpy = () => {
       const sections = document.getElementsByClassName('notion-h')
       let prevBBox = null
-      let currentSectionId = activeSection
+      let currentSectionId = activeSectionRef.current
       for (let i = 0; i < sections.length; ++i) {
         const section = sections[i]
         if (!section || !(section instanceof Element)) continue

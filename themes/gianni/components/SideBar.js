@@ -1,6 +1,7 @@
 import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import SmartLink from '@/components/SmartLink'
+import Image from 'next/image'
 import Announcement from './Announcement'
 import Catalog from './Catalog'
 
@@ -12,10 +13,12 @@ export default function SideBar(props) {
     <div className='space-y-4' style={{ position: 'sticky', top: 'calc(var(--header-height) + 1rem)', alignSelf: 'start' }}>
       <div className='gianni-sidebar-widget'>
         <div className='flex items-center gap-3 mb-2'>
-          <img
+          <Image
             src={siteConfig('GIANNI_AVATAR_IMG')}
             alt='avatar'
-            className='w-10 h-10 rounded-full object-cover'
+            width={40}
+            height={40}
+            className='rounded-full object-cover'
             style={{ border: '1px solid var(--border)' }}
           />
           <div>

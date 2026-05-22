@@ -58,7 +58,7 @@ export default function Header() {
       >
         <nav
           aria-label='Main navigation'
-          className='gianni-nav-pill h-[3.25rem] w-full max-w-[680px] px-3 sm:px-2.5 flex items-center justify-between'
+          className='gianni-nav-pill pointer-events-auto h-[3.25rem] w-full max-w-[680px] px-3 sm:px-2.5 flex items-center justify-between'
         >
           {blogHomeHref === '/blog' ? (
             <a

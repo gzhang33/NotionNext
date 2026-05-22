@@ -67,7 +67,7 @@ export default function Header() {
               className='shrink-0 pl-1 sm:pl-3.5 py-1.5 gianni-nav-logo'
               aria-label='Scroll to top'
             >
-              {siteConfig('AUTHOR')}<span className='gianni-nav-dot'>.</span>
+              Gianni<span className='gianni-nav-dot'>.</span>
             </a>
           ) : (
             <SmartLink
@@ -76,7 +76,7 @@ export default function Header() {
               className='shrink-0 pl-1 sm:pl-3.5 py-1.5 gianni-nav-logo'
               aria-label='Scroll to top'
             >
-              {siteConfig('AUTHOR')}<span className='gianni-nav-dot'>.</span>
+              Gianni<span className='gianni-nav-dot'>.</span>
             </SmartLink>
           )}
 

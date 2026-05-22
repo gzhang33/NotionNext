@@ -135,11 +135,16 @@ const Style = () => {
       #theme-gianni .gianni-nav-logo {
         font-family: 'Syne', sans-serif;
         font-weight: 800;
-        font-size: 13px;
+        font-size: 14px;
         letter-spacing: -0.02em;
         line-height: 1;
-        color: rgba(255, 255, 255, 0.85);
+        color: #fff;
         text-decoration: none;
+      }
+      @media (min-width: 640px) {
+        #theme-gianni .gianni-nav-logo {
+          font-size: 13px;
+        }
       }
       .light #theme-gianni .gianni-nav-logo {
         color: #fff;
@@ -156,7 +161,7 @@ const Style = () => {
         letter-spacing: 0.02em;
         line-height: 1;
         transition: all 200ms;
-        color: rgba(255, 255, 255, 0.4);
+        color: rgba(255, 255, 255, 0.5);
         text-decoration: none;
         cursor: pointer;
       }
